@@ -35,7 +35,9 @@ public sealed partial class LibraryViewModel(AppServices services) : ObservableO
     }
 
     [RelayCommand]
-    public void Reindex() => services.RequestReindex();
+    public void Reindex() => services.RequestLibraryRead();
+
+    public Task RebuildMarkdownAsync(string? plugin) => services.RebuildMarkdownAsync(plugin);
 
     [RelayCommand]
     public void OpenRoot() => OpenFolder(services.Settings.RootDirectory);

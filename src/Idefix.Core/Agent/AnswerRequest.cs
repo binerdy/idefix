@@ -6,4 +6,4 @@ public sealed record AnswerRequest(
     string Question,
     IReadOnlyList<ChatMessage> History,
     IReadOnlyList<string> Plugins,
-    bool DeepThinking);
+    bool DeepThinking = true);

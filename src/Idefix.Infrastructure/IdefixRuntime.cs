@@ -1,12 +1,12 @@
 ﻿using Idefix.Core.Agent;
 using Idefix.Core.Documents;
-using Idefix.Core.Indexing;
 using Idefix.Core.Knowledge;
+using Idefix.Core.Markdown;
 using Idefix.Core.Settings;
 using Idefix.Infrastructure.Agent;
-using Idefix.Infrastructure.Indexing;
 using Idefix.Infrastructure.Knowledge;
 using Idefix.Infrastructure.Llm;
+using Idefix.Infrastructure.Markdown;
 using Idefix.Infrastructure.Parsing;
 
 namespace Idefix.Infrastructure;
@@ -19,16 +19,16 @@ public sealed class IdefixRuntime : IDisposable
         IdefixSettings settings,
         IKnowledgeCatalog catalog,
         IDocumentParser parser,
-        IVectorIndex index,
-        IKnowledgeIndexer indexer,
+        IDocumentLibrary library,
+        ISectionStore sections,
         IAnswerEngine answerEngine,
         KnowledgeWatcher watcher)
     {
         this.Settings = settings;
         this.Catalog = catalog;
         this.Parser = parser;
-        this.Index = index;
-        this.Indexer = indexer;
+        this.Library = library;
+        this.Sections = sections;
         this.AnswerEngine = answerEngine;
         this.watcher = watcher;
         this.watcher.Changed += (_, _) => this.KnowledgeChanged?.Invoke(this, EventArgs.Empty);
@@ -42,9 +42,9 @@ public sealed class IdefixRuntime : IDisposable
 
     public IDocumentParser Parser { get; }
 
-    public IVectorIndex Index { get; }
+    public IDocumentLibrary Library { get; }
 
-    public IKnowledgeIndexer Indexer { get; }
+    public ISectionStore Sections { get; }
 
     public IAnswerEngine AnswerEngine { get; }
 
@@ -53,19 +53,16 @@ public sealed class IdefixRuntime : IDisposable
         Directory.CreateDirectory(settings.RootDirectory);
         var catalog = new FileSystemKnowledgeCatalog();
         var parser = CompositeDocumentParser.CreateDefault();
-        var index = new SqliteVectorIndex(settings.RootDirectory, settings.Llm.EmbeddingModel);
-        var clients = LlmClients.Create(settings.Llm, httpClient);
-        var embedder = new EmbeddingGeneratorEmbedder(clients.Embeddings);
-        var indexer = new KnowledgeIndexer(catalog, parser, embedder, index, ChunkingOptions.Default);
-        var search = new KnowledgeSearch(embedder, index);
+        var library = new DocumentLibrary(settings.RootDirectory, catalog, parser);
+        var sections = new MarkdownSectionStore();
         var engine = new SemanticKernelAnswerEngine(
-            clients.Kernel,
-            search,
-            parser,
-            new AnswerEngineOptions(settings.RootDirectory, settings.PrePrompt, settings.ContextMode),
+            LlmClients.CreateKernel(settings.Llm, httpClient),
+            library,
+            sections,
+            new AnswerEngineOptions(settings.PrePrompt, settings.Llm.MaxContextTokens),
             timeProvider);
         var watcher = new KnowledgeWatcher(settings.RootDirectory, TimeSpan.FromSeconds(2), timeProvider);
-        return new IdefixRuntime(settings, catalog, parser, index, indexer, engine, watcher);
+        return new IdefixRuntime(settings, catalog, parser, library, sections, engine, watcher);
     }
 
     public IReadOnlyList<KnowledgePlugin> Plugins() => this.Catalog.DiscoverPlugins(this.Settings.RootDirectory);
@@ -76,6 +73,6 @@ public sealed class IdefixRuntime : IDisposable
     public void Dispose()
     {
         this.watcher.Dispose();
-        (this.Index as IDisposable)?.Dispose();
+        (this.Sections as IDisposable)?.Dispose();
     }
 }

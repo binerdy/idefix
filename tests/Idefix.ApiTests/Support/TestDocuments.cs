@@ -20,7 +20,14 @@ internal static class TestDocuments
         {
             foreach (var line in Lines(pages[i]))
             {
-                body.AppendChild(Paragraph(new Text(line)));
+                var (text, level) = Heading(line);
+                var paragraph = Paragraph(new Text(text));
+                if (level > 0)
+                {
+                    paragraph.PrependChild(new ParagraphProperties { ParagraphStyleId = new ParagraphStyleId { Val = $"Heading{level}" } });
+                }
+
+                body.AppendChild(paragraph);
             }
 
             if (i < pages.Length - 1)
@@ -45,7 +52,8 @@ internal static class TestDocuments
             var y = 760d;
             foreach (var line in Lines(lines))
             {
-                page.AddText(line, 12, new PdfPoint(60, y), font);
+                var (text, level) = Heading(line);
+                page.AddText(text, level switch { 1 => 22, 2 => 16, _ => 12 }, new PdfPoint(60, y), font);
                 y -= 40;
             }
         }
@@ -57,6 +65,12 @@ internal static class TestDocuments
     public static void Touch(string path, DateTime lastWriteUtc) => File.SetLastWriteTimeUtc(path, lastWriteUtc);
 
     private static string[] Lines(string page) => page.Split('\n');
+
+    private static (string Text, int Level) Heading(string line)
+    {
+        var level = line.TakeWhile(c => c == '#').Count();
+        return level > 0 && line.Length > level && line[level] == ' ' ? (line[(level + 1)..], level) : (line, 0);
+    }
 
     private static Paragraph Paragraph(OpenXmlElement content)
     {

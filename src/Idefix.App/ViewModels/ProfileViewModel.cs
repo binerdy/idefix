@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Idefix.App.Services;
-using Idefix.Core.Agent;
 using Idefix.Core.Settings;
 
 namespace Idefix.App.ViewModels;
@@ -19,7 +18,6 @@ public sealed partial class ProfileViewModel : ObservableObject
         this.Endpoint = string.Empty;
         this.ApiKey = string.Empty;
         this.ChatModel = string.Empty;
-        this.EmbeddingModel = string.Empty;
         this.PrePrompt = string.Empty;
         this.Status = string.Empty;
         this.UpdateStatus = string.Empty;
@@ -59,13 +57,10 @@ public sealed partial class ProfileViewModel : ObservableObject
     public partial string ChatModel { get; set; }
 
     [ObservableProperty]
-    public partial string EmbeddingModel { get; set; }
+    public partial double MaxContextTokens { get; set; }
 
     [ObservableProperty]
     public partial string PrePrompt { get; set; }
-
-    [ObservableProperty]
-    public partial bool UseFullFiles { get; set; }
 
     [ObservableProperty]
     public partial int ThemeIndex { get; set; }
@@ -96,9 +91,8 @@ public sealed partial class ProfileViewModel : ObservableObject
         this.Endpoint = settings.Llm.Endpoint?.ToString() ?? string.Empty;
         this.ApiKey = settings.Llm.ApiKey;
         this.ChatModel = settings.Llm.ChatModel;
-        this.EmbeddingModel = settings.Llm.EmbeddingModel;
+        this.MaxContextTokens = settings.Llm.MaxContextTokens;
         this.PrePrompt = settings.PrePrompt;
-        this.UseFullFiles = settings.ContextMode == ContextMode.FullFiles;
         this.ThemeIndex = (int)settings.Theme;
         this.LanguageIndex = (int)settings.Language;
         this.NightlyUpdates = settings.NightlyUpdates;
@@ -144,7 +138,6 @@ public sealed partial class ProfileViewModel : ObservableObject
             RootDirectory = this.RootDirectory.Trim(),
             Llm = this.BuildLlm(),
             PrePrompt = this.PrePrompt,
-            ContextMode = this.UseFullFiles ? ContextMode.FullFiles : ContextMode.Chunks,
             Theme = (AppTheme)this.ThemeIndex,
             Language = (AppLanguage)this.LanguageIndex,
             NightlyUpdates = this.NightlyUpdates,
@@ -166,9 +159,12 @@ public sealed partial class ProfileViewModel : ObservableObject
         this.UpdateStatus = await this.services.CheckForUpdatesAsync();
     }
 
+    private static int ContextTokens(double value) =>
+        double.IsNaN(value) || value < 1_000 ? LlmSettings.DefaultContextTokens : (int)Math.Min(value, int.MaxValue);
+
     private LlmSettings BuildLlm()
     {
         var endpoint = Uri.TryCreate(this.Endpoint.Trim(), UriKind.Absolute, out var parsed) ? LlmSettings.AsBaseAddress(parsed) : null;
-        return new LlmSettings((LlmProviderKind)this.ProviderIndex, endpoint, this.ApiKey.Trim(), this.ChatModel.Trim(), this.EmbeddingModel.Trim());
+        return new LlmSettings((LlmProviderKind)this.ProviderIndex, endpoint, this.ApiKey.Trim(), this.ChatModel.Trim(), ContextTokens(this.MaxContextTokens));
     }
 }

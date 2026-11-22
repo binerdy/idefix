@@ -47,9 +47,10 @@
           </Grid.ColumnDefinitions>
           <ComboBox Header="{x:Bind services:Strings.Get('ChatModel')}" IsEditable="True" HorizontalAlignment="Stretch"
                     ItemsSource="{x:Bind ViewModel.AvailableModels}" Text="{x:Bind ViewModel.ChatModel, Mode=TwoWay}" />
-          <ComboBox Grid.Column="1" Header="{x:Bind services:Strings.Get('EmbeddingModel')}" IsEditable="True" HorizontalAlignment="Stretch"
-                    ItemsSource="{x:Bind ViewModel.AvailableModels}" Text="{x:Bind ViewModel.EmbeddingModel, Mode=TwoWay}" />
+          <NumberBox Grid.Column="1" Header="{x:Bind services:Strings.Get('ContextWindow')}" Minimum="1000" SmallChange="1000" LargeChange="32000"
+                     SpinButtonPlacementMode="Hidden" Value="{x:Bind ViewModel.MaxContextTokens, Mode=TwoWay}" />
         </Grid>
+        <TextBlock Text="{x:Bind services:Strings.Get('ContextWindowHint')}" Style="{StaticResource HintTextStyle}" />
         <StackPanel Orientation="Horizontal" Spacing="12">
           <Button Content="{x:Bind services:Strings.Get('DiscoverModels')}" Command="{x:Bind ViewModel.DiscoverModelsCommand}" />
           <ProgressRing Width="16" Height="16" IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
@@ -61,10 +62,6 @@
                    AcceptsReturn="True" TextWrapping="Wrap" MinHeight="110" />
           <TextBlock Text="{x:Bind services:Strings.Get('PrePromptHint')}" Style="{StaticResource HintTextStyle}" />
         </StackPanel>
-        <RadioButtons Header="{x:Bind services:Strings.Get('ContextMode')}" MaxColumns="2">
-          <RadioButton Content="{x:Bind services:Strings.Get('ContextChunks')}" IsChecked="{x:Bind views:ViewHelpers.Not(ViewModel.UseFullFiles), Mode=OneWay}" />
-          <RadioButton Content="{x:Bind services:Strings.Get('ContextFullFiles')}" IsChecked="{x:Bind ViewModel.UseFullFiles, Mode=TwoWay}" />
-        </RadioButtons>
       </StackPanel>
 
       <StackPanel x:Name="SettingsPanel" Spacing="18" Visibility="Collapsed">

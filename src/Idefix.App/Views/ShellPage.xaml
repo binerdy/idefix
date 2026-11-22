@@ -141,9 +141,9 @@
           </InfoBar.ActionButton>
         </InfoBar>
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <ProgressRing Width="12" Height="12" IsActive="{x:Bind ViewModel.Services.IsIndexing, Mode=OneWay}" />
-          <TextBlock Text="{x:Bind ViewModel.Services.IndexStatus, Mode=OneWay}" Style="{StaticResource HintTextStyle}" TextWrapping="NoWrap"
-                     TextTrimming="CharacterEllipsis" MaxWidth="230" ToolTipService.ToolTip="{x:Bind ViewModel.Services.IndexStatus, Mode=OneWay}" />
+          <ProgressRing Width="12" Height="12" IsActive="{x:Bind ViewModel.Services.IsReading, Mode=OneWay}" />
+          <TextBlock Text="{x:Bind ViewModel.Services.LibraryStatus, Mode=OneWay}" Style="{StaticResource HintTextStyle}" TextWrapping="NoWrap"
+                     TextTrimming="CharacterEllipsis" MaxWidth="230" ToolTipService.ToolTip="{x:Bind ViewModel.Services.LibraryStatus, Mode=OneWay}" />
         </StackPanel>
       </StackPanel>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Idefix.Core.Chat;
-using Idefix.Core.Indexing;
+using Idefix.Core.Knowledge;
 using Idefix.Core.Settings;
 using Idefix.Core.Updates;
 using Idefix.Infrastructure;
@@ -22,9 +23,9 @@ public sealed partial class AppServices : ObservableObject, IDisposable
 
     private readonly ISettingsStore settingsStore;
     private readonly DispatcherQueue dispatcher;
-    private readonly SemaphoreSlim indexingGate = new(1, 1);
+    private readonly SemaphoreSlim readingGate = new(1, 1);
     private readonly CancellationTokenSource lifetime = new();
-    private bool reindexPending;
+    private bool readPending;
 
     private AppServices(ISettingsStore settingsStore, ISessionStore sessionStore, IdefixSettings settings, DispatcherQueue dispatcher)
     {
@@ -35,7 +36,7 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         this.HttpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
         this.Models = new OpenAiCompatibleModelCatalog(this.HttpClient);
         this.Updates = new VelopackUpdateService(Repository);
-        this.IndexStatus = Strings.Get("IndexIdle");
+        this.LibraryStatus = string.Empty;
     }
 
     public event EventHandler? SettingsChanged;
@@ -59,15 +60,19 @@ public sealed partial class AppServices : ObservableObject, IDisposable
     public nint WindowHandle { get; set; }
 
     [ObservableProperty]
-    public partial string IndexStatus { get; set; }
+    public partial string LibraryStatus { get; set; }
 
     [ObservableProperty]
-    public partial bool IsIndexing { get; set; }
+    public partial bool IsReading { get; set; }
 
     [ObservableProperty]
     public partial bool IsUpdateReady { get; set; }
 
     public bool IsConfigured => this.Runtime is not null;
+
+    public static string FormatTokens(int tokens) => tokens >= 1_000
+        ? string.Create(CultureInfo.CurrentCulture, $"{tokens / 1000.0:0.#}k")
+        : tokens.ToString(CultureInfo.CurrentCulture);
 
     public static async Task<AppServices> CreateAsync(DispatcherQueue dispatcher)
     {
@@ -76,7 +81,7 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         var settings = await LoadSettingsAsync(settingsStore);
         Strings.Initialize(settings.Language);
         var services = new AppServices(settingsStore, new JsonSessionStore(appData), settings, dispatcher);
-        services.RebuildRuntime();
+        services.RebuildRuntime(readLibrary: false);
         return services;
     }
 
@@ -85,16 +90,87 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         var previous = this.Settings;
         this.Settings = settings;
         await this.settingsStore.SaveAsync(settings, this.lifetime.Token);
-        if (previous.RootDirectory != settings.RootDirectory || previous.Llm != settings.Llm
-            || previous.PrePrompt != settings.PrePrompt || previous.ContextMode != settings.ContextMode)
+        if (previous.RootDirectory != settings.RootDirectory || previous.Llm != settings.Llm || previous.PrePrompt != settings.PrePrompt)
         {
-            this.RebuildRuntime();
+            this.RebuildRuntime(readLibrary: true);
         }
 
         this.SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void RequestReindex() => _ = this.ReindexAsync();
+    public void RequestLibraryRead() => _ = this.ReadLibraryAsync(observer: null);
+
+    public async Task RebuildMarkdownAsync(string? plugin)
+    {
+        if (this.Runtime is not { } runtime)
+        {
+            return;
+        }
+
+        this.IsReading = true;
+        try
+        {
+            var snapshot = await Task.Run(() => runtime.Library.LoadAsync(plugin is null ? null : (string[])[plugin], progress: null, this.lifetime.Token), this.lifetime.Token);
+            await Task.Run(() => runtime.Sections.RebuildAsync(snapshot.Documents, this.lifetime.Token), this.lifetime.Token);
+        }
+        finally
+        {
+            this.IsReading = false;
+        }
+
+        this.RequestLibraryRead();
+    }
+
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Background reading reports errors in the UI instead of crashing.")]
+    public async Task ReadLibraryAsync(IProgress<LibraryProgress>? observer)
+    {
+        if (this.Runtime is not { } runtime)
+        {
+            return;
+        }
+
+        if (!await this.readingGate.WaitAsync(TimeSpan.Zero, this.lifetime.Token))
+        {
+            this.readPending = true;
+            return;
+        }
+
+        try
+        {
+            do
+            {
+                this.readPending = false;
+                this.OnUi(() => this.IsReading = true);
+                var progress = new Progress<LibraryProgress>(p =>
+                {
+                    observer?.Report(p);
+                    this.OnUi(() => this.LibraryStatus = Strings.Format("LibraryReadingFormat", Math.Min(p.Completed + 1, p.Total), p.Total));
+                });
+                var snapshot = await Task.Run(() => runtime.Library.LoadAsync(plugins: null, progress, this.lifetime.Token), this.lifetime.Token);
+                var sections = await Task.Run(() => runtime.Sections.SynchronizeAsync(snapshot.Documents, this.lifetime.Token), this.lifetime.Token);
+                await runtime.Sections.PruneAsync(snapshot.Documents.Select(d => d.Document).ToList(), this.lifetime.Token);
+                var tokens = sections.Sum(s => s.EstimatedTokens);
+                var status = snapshot.Failures.Count > 0
+                    ? Strings.Format("LibraryFailuresFormat", snapshot.Failures.Count, snapshot.Failures[0].Reason.ReplaceLineEndings(" "))
+                    : Strings.Format("LibraryReadyFormat", snapshot.Documents.Count, sections.Count, FormatTokens(tokens));
+                this.OnUi(() => this.LibraryStatus = status);
+            }
+            while (this.readPending && ReferenceEquals(runtime, this.Runtime));
+        }
+        catch (OperationCanceledException) when (this.lifetime.IsCancellationRequested)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            this.OnUi(() => this.LibraryStatus = Strings.Format("LibraryFailedFormat", ex.Message));
+        }
+        finally
+        {
+            this.OnUi(() => this.IsReading = false);
+            this.readingGate.Release();
+        }
+    }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Update checks are best-effort and must never crash the app.")]
     public async Task<string> CheckForUpdatesAsync()
@@ -122,7 +198,7 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         this.lifetime.Dispose();
         this.Runtime?.Dispose();
         this.HttpClient.Dispose();
-        this.indexingGate.Dispose();
+        this.readingGate.Dispose();
     }
 
     private static async Task<IdefixSettings> LoadSettingsAsync(DpapiSettingsStore store)
@@ -162,7 +238,7 @@ public sealed partial class AppServices : ObservableObject, IDisposable
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "An invalid provider configuration leaves the app usable in setup mode.")]
-    private void RebuildRuntime()
+    private void RebuildRuntime(bool readLibrary)
     {
         if (this.Runtime is { } old)
         {
@@ -180,60 +256,18 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         {
             this.Runtime = IdefixRuntime.Create(this.Settings, this.HttpClient, this.Time);
             this.Runtime.KnowledgeChanged += this.OnKnowledgeChanged;
-            this.RequestReindex();
-        }
-        catch (Exception ex)
-        {
-            this.IndexStatus = Strings.Format("IndexFailedFormat", ex.Message);
-        }
-    }
-
-    private void OnKnowledgeChanged(object? sender, EventArgs e) => this.RequestReindex();
-
-    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Background indexing reports errors in the UI instead of crashing.")]
-    private async Task ReindexAsync()
-    {
-        if (this.Runtime is not { } runtime)
-        {
-            return;
-        }
-
-        if (!await this.indexingGate.WaitAsync(TimeSpan.Zero, this.lifetime.Token))
-        {
-            this.reindexPending = true;
-            return;
-        }
-
-        try
-        {
-            do
+            if (readLibrary)
             {
-                this.reindexPending = false;
-                this.OnUi(() => this.IsIndexing = true);
-                var progress = new Progress<IndexingProgress>(p => this.OnUi(() =>
-                    this.IndexStatus = p.IsComplete ? Strings.Get("IndexIdle") : Strings.Format("IndexingFormat", p.Completed + 1, p.Total)));
-                var result = await Task.Run(() => runtime.Indexer.SynchronizeAsync(runtime.Settings.RootDirectory, progress, this.lifetime.Token), this.lifetime.Token);
-                if (result.Failures.Count > 0)
-                {
-                    this.OnUi(() => this.IndexStatus = Strings.Format("IndexFailuresFormat", result.Failures.Count, result.Failures[0].Reason.ReplaceLineEndings(" ")));
-                }
+                this.RequestLibraryRead();
             }
-            while (this.reindexPending && ReferenceEquals(runtime, this.Runtime));
-        }
-        catch (OperationCanceledException) when (this.lifetime.IsCancellationRequested)
-        {
-            return;
         }
         catch (Exception ex)
         {
-            this.OnUi(() => this.IndexStatus = Strings.Format("IndexFailedFormat", ex.Message));
-        }
-        finally
-        {
-            this.OnUi(() => this.IsIndexing = false);
-            this.indexingGate.Release();
+            this.LibraryStatus = Strings.Format("LibraryFailedFormat", ex.Message);
         }
     }
+
+    private void OnKnowledgeChanged(object? sender, EventArgs e) => this.RequestLibraryRead();
 
     private void OnUi(Action action)
     {

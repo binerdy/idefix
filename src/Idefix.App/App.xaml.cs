@@ -2,6 +2,7 @@
 using Idefix.App.Services;
 using Idefix.App.ViewModels;
 using Idefix.App.Views;
+using Idefix.Core.Knowledge;
 using Idefix.Core.Settings;
 
 namespace Idefix.App;
@@ -73,11 +74,11 @@ public sealed partial class IdefixApplication : Application
         });
         splash.Report(0.5, "SplashFoundFormat", documents, plugins);
 
-        if (app.Runtime is { } runtime)
+        if (app.IsConfigured)
         {
-            splash.Report(0.6, "SplashCheckingIndex");
-            var indexed = await runtime.Index.GetFingerprintsAsync(CancellationToken.None);
-            splash.Report(0.7, "SplashIndexFormat", indexed.Count);
+            var reading = new Progress<LibraryProgress>(p =>
+                splash.Report(0.5 + (0.25 * p.Completed / Math.Max(1, p.Total)), "SplashReadingFormat", Math.Min(p.Completed + 1, p.Total), p.Total));
+            await app.ReadLibraryAsync(reading);
         }
     }
 

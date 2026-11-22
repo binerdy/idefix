@@ -39,12 +39,6 @@
   <data name="AskPlaceholder" xml:space="preserve">
     <value>Idefix fragen</value>
   </data>
-  <data name="Think" xml:space="preserve">
-    <value>Nachdenken</value>
-  </data>
-  <data name="ThinkHint" xml:space="preserve">
-    <value>Gründliche agentische Suche (Ping-Pong) statt schneller Suche</value>
-  </data>
   <data name="Dictate" xml:space="preserve">
     <value>Diktieren</value>
   </data>
@@ -59,15 +53,6 @@
   </data>
   <data name="NoPlugins" xml:space="preserve">
     <value>Noch keine Wissens-Plugins. Lege Ordner in deinem Wissensordner an.</value>
-  </data>
-  <data name="TraceTitleFormat" xml:space="preserve">
-    <value>{0}× gesucht</value>
-  </data>
-  <data name="TraceStepFormat" xml:space="preserve">
-    <value>«{0}» → {1} Passagen</value>
-  </data>
-  <data name="Searching" xml:space="preserve">
-    <value>Durchsuche Wissen …</value>
   </data>
   <data name="TemporaryChat" xml:space="preserve">
     <value>Temporärer Chat (wird nicht gespeichert)</value>
@@ -135,9 +120,6 @@
   <data name="ChatModel" xml:space="preserve">
     <value>Chat-Modell</value>
   </data>
-  <data name="EmbeddingModel" xml:space="preserve">
-    <value>Embedding-Modell</value>
-  </data>
   <data name="DiscoverModels" xml:space="preserve">
     <value>Modelle suchen</value>
   </data>
@@ -155,15 +137,6 @@
   </data>
   <data name="PrePromptHint" xml:space="preserve">
     <value>Steuert Idefix über alle Sitzungen hinweg.</value>
-  </data>
-  <data name="ContextMode" xml:space="preserve">
-    <value>Kontext für das Modell</value>
-  </data>
-  <data name="ContextChunks" xml:space="preserve">
-    <value>Ausschnitte (RAG)</value>
-  </data>
-  <data name="ContextFullFiles" xml:space="preserve">
-    <value>Ganze Dateien</value>
   </data>
   <data name="Appearance" xml:space="preserve">
     <value>Darstellung</value>
@@ -228,20 +201,8 @@
   <data name="Saved" xml:space="preserve">
     <value>Gespeichert.</value>
   </data>
-  <data name="IndexingFormat" xml:space="preserve">
-    <value>Indexiere {0}/{1} …</value>
-  </data>
-  <data name="IndexIdle" xml:space="preserve">
-    <value>Index aktuell</value>
-  </data>
-  <data name="IndexFailedFormat" xml:space="preserve">
-    <value>Indexierung fehlgeschlagen: {0}</value>
-  </data>
-  <data name="IndexFailuresFormat" xml:space="preserve">
-    <value>{0} Dokumente konnten nicht indexiert werden: {1}</value>
-  </data>
   <data name="Reindex" xml:space="preserve">
-    <value>Jetzt neu indexieren</value>
+    <value>Dokumente neu einlesen</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
     <value>Ordner öffnen</value>
@@ -250,10 +211,10 @@
     <value>{0} Dokumente</value>
   </data>
   <data name="LibraryHint" xml:space="preserve">
-    <value>Wissens-Plugins sind die Ordner in deinem Wissensordner. Deaktivierte Plugins werden nie durchsucht.</value>
+    <value>Wissens-Plugins sind die Ordner in deinem Wissensordner. Idefix teilt jedes Dokument in Markdown-Abschnitte im Ordner _markdown des Plugins und sendet nur die Abschnitte, die eine Frage braucht. Du kannst sie öffnen und bearbeiten.</value>
   </data>
   <data name="SetupRequired" xml:space="preserve">
-    <value>Vervollständige dein Profil: Anbieter, API-Schlüssel und Modelle.</value>
+    <value>Vervollständige dein Profil: Anbieter, API-Schlüssel und Chat-Modell.</value>
   </data>
   <data name="OpenProfile" xml:space="preserve">
     <value>Profil öffnen</value>
@@ -309,12 +270,6 @@
   <data name="SplashFoundFormat" xml:space="preserve">
     <value>{0} Dokumente in {1} Plugins gefunden</value>
   </data>
-  <data name="SplashCheckingIndex" xml:space="preserve">
-    <value>Prüfe den Index …</value>
-  </data>
-  <data name="SplashIndexFormat" xml:space="preserve">
-    <value>{0} Dokumente indexiert</value>
-  </data>
   <data name="SplashLoadingChats" xml:space="preserve">
     <value>Lade Chats …</value>
   </data>
@@ -323,5 +278,59 @@
   </data>
   <data name="SplashReady" xml:space="preserve">
     <value>Bereit.</value>
+  </data>
+  <data name="ReadingDocuments" xml:space="preserve">
+    <value>Lese Dokumente …</value>
+  </data>
+  <data name="ContextFormat" xml:space="preserve">
+    <value>{0} Dokumente gesendet (≈ {1} Tokens)</value>
+  </data>
+  <data name="ContextTooLargeFormat" xml:space="preserve">
+    <value>Die aktiven Dokumente brauchen etwa {0} Tokens, das Kontextfenster erlaubt {1}. Schalte mit + Plugins für diesen Chat aus oder erhöhe das Kontextfenster im Profil.</value>
+  </data>
+  <data name="ContextWindow" xml:space="preserve">
+    <value>Kontextfenster (Tokens)</value>
+  </data>
+  <data name="ContextWindowHint" xml:space="preserve">
+    <value>Die Kontextgrösse des Modells, z. B. 524288 für GLM-5.3-Flash auf Planet Express. Idefix sendet nur die relevanten Abschnitte und nie mehr als hineinpasst.</value>
+  </data>
+  <data name="LibraryReadingFormat" xml:space="preserve">
+    <value>Lese Dokumente {0}/{1} …</value>
+  </data>
+  <data name="LibraryReadyFormat" xml:space="preserve">
+    <value>{0} Dokumente · {1} Abschnitte bereit (≈ {2} Tokens)</value>
+  </data>
+  <data name="LibraryFailuresFormat" xml:space="preserve">
+    <value>{0} Dokumente konnten nicht gelesen werden: {1}</value>
+  </data>
+  <data name="LibraryFailedFormat" xml:space="preserve">
+    <value>Lesen der Dokumente fehlgeschlagen: {0}</value>
+  </data>
+  <data name="SplashReadingFormat" xml:space="preserve">
+    <value>Idefix liest deine Dokumente {0}/{1} …</value>
+  </data>
+  <data name="SectionsContextFormat" xml:space="preserve">
+    <value>{0} von {1} Abschnitten gesendet (≈ {2} Tokens)</value>
+  </data>
+  <data name="Think" xml:space="preserve">
+    <value>Nachdenken</value>
+  </data>
+  <data name="ThinkHint" xml:space="preserve">
+    <value>Ping-Pong: Das Modell darf vor der Antwort in mehreren Runden weitere Abschnitte anfordern</value>
+  </data>
+  <data name="SelectingRoundFormat" xml:space="preserve">
+    <value>Runde {0}: wähle aus {1} Abschnitten …</value>
+  </data>
+  <data name="RoundFormat" xml:space="preserve">
+    <value>Runde {0}: {1}</value>
+  </data>
+  <data name="RebuildMarkdown" xml:space="preserve">
+    <value>Markdown neu erstellen</value>
+  </data>
+  <data name="RebuildMarkdownAllHint" xml:space="preserve">
+    <value>Löscht die Markdown-Abschnitte aller Plugins und erstellt sie neu. Manuelle Änderungen in den _markdown-Ordnern gehen verloren.</value>
+  </data>
+  <data name="RebuildMarkdownPluginHintFormat" xml:space="preserve">
+    <value>Löscht die Markdown-Abschnitte von «{0}» und erstellt sie neu. Manuelle Änderungen im _markdown-Ordner gehen verloren.</value>
   </data>
 </root>
