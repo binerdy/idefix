@@ -22,8 +22,8 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
         this.project = project;
         this.IsTemporary = isTemporary;
         this.saved = saved;
-        this.DeepThinking = session.DeepThinking;
         this.Prompt = string.Empty;
+        this.DeepThinking = session.DeepThinking;
         foreach (var message in session.Messages)
         {
             this.Messages.Add(new MessageViewModel(message));
@@ -120,8 +120,14 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
             {
                 switch (answerEvent)
                 {
-                    case TraceUpdated trace:
-                        reply.AddTrace(trace.Step);
+                    case SelectingSections selecting:
+                        reply.ShowSelecting(selecting.Round, selecting.TotalSections);
+                        break;
+                    case SectionsPicked picked:
+                        reply.AddRound(picked.Round);
+                        break;
+                    case ContextPrepared prepared:
+                        reply.ShowContext(prepared.Summary);
                         break;
                     case TextDelta delta:
                         reply.AppendText(delta.Text);
@@ -136,6 +142,13 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
         catch (OperationCanceledException)
         {
             reply.IsStreaming = false;
+        }
+        catch (ContextTooLargeException tooLarge)
+        {
+            reply.Fail(Strings.Format(
+                "ContextTooLargeFormat",
+                AppServices.FormatTokens(tooLarge.EstimatedTokens),
+                AppServices.FormatTokens(tooLarge.Limit)));
         }
         catch (Exception ex)
         {

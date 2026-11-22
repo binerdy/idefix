@@ -54,6 +54,26 @@ public sealed class DocumentParserTests : IDisposable
     }
 
     [Fact]
+    public void DocxHeadingStylesBecomeHeadingLevels()
+    {
+        var path = TestDocuments.WriteDocx(this.root.Combine("h.docx"), "# Titel\n## Unterkapitel\nFliesstext");
+
+        var lines = this.parser.Parse(path).Pages[0].Lines;
+
+        Assert.Equal([1, 2, 0], lines.Select(l => l.HeadingLevel));
+    }
+
+    [Fact]
+    public void LargerPdfTextIsRecognizedAsHeading()
+    {
+        var path = TestDocuments.WritePdf(this.root.Combine("h.pdf"), "# Mietrecht\n## Kuendigung\nDie Frist betraegt drei Monate\nSie gilt auf die ortsueblichen Termine");
+
+        var lines = this.parser.Parse(path).Pages[0].Lines;
+
+        Assert.Equal([1, 2, 0, 0], lines.Select(l => l.HeadingLevel));
+    }
+
+    [Fact]
     public void UnsupportedFilesAreRejected()
     {
         Assert.False(this.parser.CanParse("notes.txt"));

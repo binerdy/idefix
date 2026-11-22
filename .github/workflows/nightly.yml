@@ -68,6 +68,6 @@ jobs:
           $version = "${{ steps.version.outputs.version }}"
           dotnet tool install -g vpk --version 1.2.161
           vpk download github --repoUrl $repo --token $env:GITHUB_TOKEN --pre
-          vpk pack --packId $env:PACK_ID --packVersion $version --packDir publish --mainExe $env:MAIN_EXE --packTitle Idefix
+          vpk pack --packId $env:PACK_ID --packVersion $version --packDir publish --mainExe $env:MAIN_EXE --packTitle Idefix --icon src/Idefix.App/Assets/Icons/idefix.ico
           vpk upload github --repoUrl $repo --token $env:GITHUB_TOKEN --publish --pre `
             --releaseName "Idefix $version" --tag "v$version" --targetCommitish "${{ github.sha }}"

@@ -16,6 +16,7 @@
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <StackPanel VerticalAlignment="Center">
           <TextBlock Text="{x:Bind services:Strings.Get('RootFolder')}" FontWeight="SemiBold" />
@@ -23,11 +24,12 @@
         </StackPanel>
         <Button Grid.Column="1" Content="{x:Bind services:Strings.Get('OpenFolder')}" Command="{x:Bind ViewModel.OpenRootCommand}" />
         <Button Grid.Column="2" Content="{x:Bind services:Strings.Get('Reindex')}" Command="{x:Bind ViewModel.ReindexCommand}" />
+        <Button Grid.Column="3" Content="{x:Bind services:Strings.Get('RebuildMarkdown')}" Click="OnRebuildAllClicked" />
       </Grid>
 
       <StackPanel Orientation="Horizontal" Spacing="8">
-        <ProgressRing Width="14" Height="14" IsActive="{x:Bind ViewModel.Services.IsIndexing, Mode=OneWay}" />
-        <TextBlock Text="{x:Bind ViewModel.Services.IndexStatus, Mode=OneWay}" Style="{StaticResource HintTextStyle}" />
+        <ProgressRing Width="14" Height="14" IsActive="{x:Bind ViewModel.Services.IsReading, Mode=OneWay}" />
+        <TextBlock Text="{x:Bind ViewModel.Services.LibraryStatus, Mode=OneWay}" Style="{StaticResource HintTextStyle}" />
       </StackPanel>
 
       <TextBlock Text="{x:Bind services:Strings.Get('NoPlugins')}" Style="{StaticResource HintTextStyle}" FontSize="14"
@@ -44,6 +46,7 @@
                   <ColumnDefinition Width="*" />
                   <ColumnDefinition Width="Auto" />
                   <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <FontIcon Glyph="&#xE8B7;" Style="{StaticResource IconGlyphStyle}" FontSize="20" />
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -54,7 +57,11 @@
                         ToolTipService.ToolTip="{x:Bind services:Strings.Get('OpenFolder')}" AutomationProperties.Name="{x:Bind services:Strings.Get('OpenFolder')}">
                   <FontIcon Glyph="&#xE838;" Style="{StaticResource IconGlyphStyle}" />
                 </Button>
-                <ToggleSwitch Grid.Column="3" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0" AutomationProperties.Name="{x:Bind Name}" />
+                <Button Grid.Column="3" Style="{StaticResource GhostButtonStyle}" Click="OnRebuildPluginClicked" Tag="{x:Bind Name}"
+                        ToolTipService.ToolTip="{x:Bind services:Strings.Get('RebuildMarkdown')}" AutomationProperties.Name="{x:Bind services:Strings.Get('RebuildMarkdown')}">
+                  <FontIcon Glyph="&#xE72C;" Style="{StaticResource IconGlyphStyle}" />
+                </Button>
+                <ToggleSwitch Grid.Column="4" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0" AutomationProperties.Name="{x:Bind Name}" />
               </Grid>
             </Border>
           </DataTemplate>

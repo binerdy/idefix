@@ -14,7 +14,7 @@ public sealed class KnowledgeCatalogTests : IDisposable
     {
         this.root.CreateDirectory("Recht");
         this.root.CreateDirectory("Finanzen", "Nested");
-        this.root.CreateDirectory(KnowledgeLayout.IndexFolderName);
+        this.root.CreateDirectory(".cache");
         this.root.CreateDirectory(".git");
 
         var plugins = this.catalog.DiscoverPlugins(this.root.Path);

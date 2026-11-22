@@ -20,9 +20,9 @@ public static class SettingsValidator
             issues.Add(SettingsIssue.ChatModelMissing);
         }
 
-        if (string.IsNullOrWhiteSpace(settings.Llm.EmbeddingModel))
+        if (settings.Llm.MaxContextTokens < 1_000)
         {
-            issues.Add(SettingsIssue.EmbeddingModelMissing);
+            issues.Add(SettingsIssue.ContextTooSmall);
         }
 
         return issues;

@@ -13,7 +13,7 @@ Profile and settings SHALL be stored locally and encrypted with Windows DPAPI fo
 - **THEN** the key cannot be found in the stored file
 
 ### Requirement: Profile tab
-The Profile tab SHALL contain first name, root folder (directory picker), LLM provider, endpoint, API key, chat model, embedding model, pre-prompt and context mode.
+The Profile tab SHALL contain first name, root folder (directory picker), LLM provider, endpoint, API key, chat model, context window (tokens) and pre-prompt.
 
 #### Scenario: Greeting uses the first name
 - **WHEN** the first name is "Anna"

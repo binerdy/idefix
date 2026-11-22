@@ -5,5 +5,5 @@ public enum SettingsIssue
     RootDirectoryMissing,
     ApiKeyMissing,
     ChatModelMissing,
-    EmbeddingModelMissing,
+    ContextTooSmall,
 }

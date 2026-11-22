@@ -1,3 +1,5 @@
+<img src="docs/brand/idefix-icon-512.png" alt="Idefix icon" width="96" align="right">
+
 # Idefix
 
 Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folder of PDFs and Word documents, ask questions, and get answers with citations you can click to see the exact highlighted lines in the original.
@@ -7,16 +9,18 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 ## Your data stays yours
 
 - Every subfolder of your knowledge folder (default `%USERPROFILE%\IdefixKnowledge`) is a **knowledge plugin**. Add, edit or delete files and Idefix re-indexes in the background.
-- Your files are opened read-only. The index lives next to them in a hidden `.idefix-index` folder.
+- Your files are opened read-only and never modified. Idefix splits them into Markdown sections in a visible `_markdown` folder inside each plugin, which you can read and edit.
 - Profile and API keys are encrypted with Windows DPAPI; chats are plain JSON in `%LOCALAPPDATA%\Idefix`.
-- Works fully offline with a local [Ollama](https://ollama.com) (chat model plus an embedding model such as `nomic-embed-text`).
+- Works with any OpenAI-compatible chat model, including a local [Ollama](https://ollama.com) or the FHNW Planet Express service. No embedding model is needed.
 
 ## Features
 
-- **Ping-pong retrieval** ("Nachdenken"): the model searches your plugins repeatedly through a `search_plugins` tool; every search appears live in the conversation. Switch it off for a single fast lookup.
+- **Sections, no embeddings**: for each question the model first sees a table of contents of all active sections and picks the ones it needs; only those are sent.
+- **Ping-pong** ("Nachdenken"): after reading its first picks, the model may ask for more sections, for up to three rounds. Each round shows up live in the conversation.
+- **Markdown stays in sync**: sections follow added, changed and deleted documents automatically; "Markdown neu erstellen" in the Library regenerates them on demand.
 - **Citations** like `[Mietrecht.pdf, p. 4]` open an in-app viewer with the cited lines highlighted, plus "Open original file".
 - **Projects and sessions** in the sidebar; plugins can be scoped per project and toggled per chat with `+`.
-- **Context mode**: send retrieved chunks (RAG) or whole files.
+- **Context window**: set the model's context size in the profile (e.g. 524288 for GLM-5.3-Flash). If the active documents don't fit, Idefix says so instead of sending them; switch plugins off for that chat with `+`.
 - **English and Swiss German**, light and dark themes, Inter typography.
 - A quiet celestial background: a sun halo by day; dim stars, a moon and the occasional shooting star at night.
 - Automatic updates via Velopack, with an opt-in for nightly builds.
@@ -41,8 +45,8 @@ $env:IDEFIX_DATA_DIR = "$env:TEMP\idefix-dev"; dotnet run --project src/Idefix.A
 
 | Path | Purpose |
 | --- | --- |
-| `src/Idefix.Core` | Domain records, interfaces and pure logic (planning, chunking, plugin scopes, sky math) |
-| `src/Idefix.Infrastructure` | PdfPig/OpenXml parsing, SQLite vector index, Semantic Kernel answer engine, DPAPI settings, Velopack |
+| `src/Idefix.Core` | Domain records, interfaces and pure logic (document context, citation lines, plugin scopes, sky math, mascot) |
+| `src/Idefix.Infrastructure` | PdfPig/OpenXml parsing, cached document library, Semantic Kernel answer engine, DPAPI settings, Velopack |
 | `src/Idefix.App` | Uno Platform app (Windows App SDK head) |
 | `tests/Idefix.ApiTests` | API-level tests with real files and a real index |
 | `openspec/` | Project conventions and capability specs |

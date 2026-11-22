@@ -24,25 +24,31 @@
                 <TextBlock Text="{x:Bind Text}" TextWrapping="Wrap" FontSize="15" IsTextSelectionEnabled="True" />
               </Border>
               <StackPanel Visibility="{x:Bind IsAssistant}" Spacing="8">
-                <Expander Visibility="{x:Bind HasTrace, Mode=OneWay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                          IsExpanded="{x:Bind IsStreaming, Mode=OneWay}" Padding="12,4">
+                <Expander Visibility="{x:Bind HasContext, Mode=OneWay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                          Padding="12,4">
                   <Expander.Header>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                       <ProgressRing Width="14" Height="14" IsActive="{x:Bind IsStreaming, Mode=OneWay}" />
-                      <FontIcon Glyph="&#xE721;" FontSize="13" Style="{StaticResource IconGlyphStyle}" Foreground="{ThemeResource SecondaryTextBrush}" />
-                      <TextBlock Text="{x:Bind TraceSummary, Mode=OneWay}" FontSize="13" Foreground="{ThemeResource SecondaryTextBrush}" />
+                      <FontIcon Glyph="&#xE8A5;" FontSize="13" Style="{StaticResource IconGlyphStyle}" Foreground="{ThemeResource SecondaryTextBrush}" />
+                      <TextBlock Text="{x:Bind ContextHeadline, Mode=OneWay}" FontSize="13" Foreground="{ThemeResource SecondaryTextBrush}" />
                     </StackPanel>
                   </Expander.Header>
-                  <ItemsControl ItemsSource="{x:Bind Trace}">
+                  <StackPanel Spacing="8">
+                  <ItemsControl ItemsSource="{x:Bind Rounds}" Visibility="{x:Bind HasRounds, Mode=OneWay}">
                     <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:TraceStepViewModel">
-                        <StackPanel Margin="0,4">
-                          <TextBlock Text="{x:Bind Headline}" FontSize="13" />
-                          <TextBlock Text="{x:Bind Sources}" Style="{StaticResource HintTextStyle}" />
-                        </StackPanel>
+                      <DataTemplate x:DataType="x:String">
+                        <TextBlock Text="{x:Bind}" FontSize="13" TextWrapping="Wrap" Margin="0,2" />
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
+                  <ItemsControl ItemsSource="{x:Bind Documents}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="x:String">
+                        <TextBlock Text="{x:Bind}" Style="{StaticResource HintTextStyle}" FontSize="13" Margin="0,2" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  </StackPanel>
                 </Expander>
                 <controls:CitedText Text="{x:Bind Text, Mode=OneWay}" Citations="{x:Bind Citations, Mode=OneWay}"
                                     LinkForeground="{ThemeResource CitationBrush}"

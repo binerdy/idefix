@@ -34,7 +34,7 @@ public sealed class KnowledgeWatcher : IDisposable
 
     private void OnFileSystemEvent(object sender, FileSystemEventArgs e)
     {
-        if (e.FullPath.Contains(KnowledgeLayout.IndexFolderName, StringComparison.OrdinalIgnoreCase))
+        if (!KnowledgeLayout.IsSupportedDocument(e.FullPath) && Path.HasExtension(e.FullPath))
         {
             return;
         }

@@ -12,7 +12,7 @@ prompts sent to the language model provider the user configured.
 - Microsoft Semantic Kernel (orchestration, tool calling) with the OpenAI connector against
   OpenAI or any OpenAI-compatible endpoint (Ollama exposes one at `/v1`)
 - UglyToad.PdfPig (PDF) and DocumentFormat.OpenXml (DOCX) with line coordinates
-- SQLite (`Microsoft.Data.Sqlite`) vector index with in-process cosine search
+- No index and no embeddings: the full text of the active documents is sent with each question
 - SkiaSharp for the celestial background, Inter as the only typeface
 - Velopack for installers and auto-update from GitHub Releases
 - xUnit v3 on Microsoft.Testing.Platform
@@ -22,9 +22,9 @@ The codebase follows the CUPID properties rather than layered ceremony:
 
 - **Composable** – small types with one purpose and few dependencies. `IdefixRuntime` wires
   them together; nothing else knows how the graph is built.
-- **Unix philosophy** – each type does one thing: `ReindexPlanner` plans, `Chunker` chunks,
-  `SqliteVectorIndex` stores, `RetrievalSession` searches and traces.
-- **Predictable** – pure functions in `Idefix.Core` (planning, chunking, scoping, sky math)
+- **Unix philosophy** – each type does one thing: `DocumentLibrary` reads and caches,
+  `DocumentContext` formats, `CitationLocator` finds cited lines, the engine streams.
+- **Predictable** – pure functions in `Idefix.Core` (context building, citation lines, scoping, sky math)
   are deterministic and covered by tests. Side effects live in `Idefix.Infrastructure`.
 - **Idiomatic** – modern C# (records, primary constructors, collection expressions), MVVM with
   source generators, `x:Bind` in XAML, analyzers at `latest-all` with warnings as errors.
@@ -37,7 +37,7 @@ Projects:
   JSON session store, Velopack updates.
 - `src/Idefix.App` – Uno Platform UI (views, view models, celestial layer).
 - `tests/Idefix.ApiTests` – tests against the public API of Core and Infrastructure with real
-  files, a real SQLite index and scripted chat completions.
+  files and scripted chat completions.
 
 ## Project Conventions
 
@@ -51,7 +51,7 @@ Projects:
 
 ### Testing Strategy
 - API-level tests: exercise public types end to end with temporary folders, generated PDF and
-  DOCX files, a real SQLite database and a deterministic hashing embedder.
+  DOCX files and real parsing.
 - No network in tests. LLM behaviour is simulated with a scripted `IChatCompletionService`.
 
 ### Git Workflow
@@ -68,9 +68,9 @@ Projects:
 - **Root directory** – chosen in the profile; every immediate subfolder is a knowledge plugin.
 - **Knowledge plugin** – a folder of `.pdf` and `.docx` files (recursive). Enabled globally,
   optionally narrowed per project, and toggled per chat session.
-- **Index** – `<Root>/.idefix-index/index.db`; rebuilt incrementally from file fingerprints.
-- **Ping-pong** – the agentic loop in which the model calls `search_plugins` repeatedly
-  before answering; every call is a trace step shown live in the UI.
+- **Document library** – the parsed text of all documents, cached in memory and re-read when a
+  file's size or modification time changes.
+- **Context window** – the model's token budget; the active documents must fit into it.
 - **Citation** – `[File.pdf, p. 4]`, resolved to plugin, page and line range for highlighting.
 
 ## Important Constraints
@@ -79,5 +79,5 @@ Projects:
 - The app must remain usable offline with a local Ollama instance.
 
 ## External Dependencies
-- An OpenAI-compatible chat and embeddings endpoint (OpenAI, Ollama, or a local router).
+- An OpenAI-compatible chat endpoint (OpenAI, Ollama, FHNW Planet Express or a local router).
 - GitHub Releases as the Velopack update feed.

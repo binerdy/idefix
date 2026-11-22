@@ -7,9 +7,11 @@ public sealed record LlmSettings(
     Uri? Endpoint,
     string ApiKey,
     string ChatModel,
-    string EmbeddingModel)
+    int MaxContextTokens = LlmSettings.DefaultContextTokens)
 {
-    public static LlmSettings Default { get; } = new(LlmProviderKind.Ollama, null, string.Empty, string.Empty, "nomic-embed-text");
+    public const int DefaultContextTokens = 128_000;
+
+    public static LlmSettings Default { get; } = new(LlmProviderKind.Ollama, null, string.Empty, string.Empty);
 
     public Uri EffectiveEndpoint => this.Endpoint ?? DefaultEndpoint(this.Provider);
 

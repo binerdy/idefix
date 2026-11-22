@@ -2,13 +2,11 @@
 
 public static class KnowledgeLayout
 {
-    public const string IndexFolderName = ".idefix-index";
+    public const string MarkdownFolderName = "_markdown";
 
     private static readonly string[] SupportedExtensions = [".pdf", ".docx"];
 
     public static IReadOnlyList<string> Extensions => SupportedExtensions;
-
-    public static string IndexDirectory(string rootDirectory) => Path.Combine(rootDirectory, IndexFolderName);
 
     public static bool IsSupportedDocument(string path)
     {
@@ -21,6 +19,10 @@ public static class KnowledgeLayout
         var extension = Path.GetExtension(path);
         return SupportedExtensions.Any(e => string.Equals(e, extension, StringComparison.OrdinalIgnoreCase));
     }
+
+    public static bool IsInMarkdownFolder(string relativePath) =>
+        relativePath.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries)
+            .Contains(MarkdownFolderName, StringComparer.OrdinalIgnoreCase);
 
     public static bool IsPluginDirectoryName(string directoryName) =>
         !string.IsNullOrWhiteSpace(directoryName) && directoryName[0] != '.';

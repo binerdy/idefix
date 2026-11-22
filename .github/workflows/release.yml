@@ -77,6 +77,6 @@ jobs:
           vpk download github --repoUrl $repo --token $env:GITHUB_TOKEN
           $sign = @()
           if ($env:SIGN_PARAMS) { $sign = @("--signParams", $env:SIGN_PARAMS) }
-          vpk pack --packId $env:PACK_ID --packVersion $version --packDir publish --mainExe $env:MAIN_EXE --packTitle Idefix @sign
+          vpk pack --packId $env:PACK_ID --packVersion $version --packDir publish --mainExe $env:MAIN_EXE --packTitle Idefix --icon src/Idefix.App/Assets/Icons/idefix.ico @sign
           vpk upload github --repoUrl $repo --token $env:GITHUB_TOKEN --publish `
             --releaseName "Idefix $version" --tag "${{ steps.version.outputs.tag }}" --targetCommitish "${{ github.sha }}"

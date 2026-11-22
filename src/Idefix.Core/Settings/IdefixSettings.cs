@@ -1,13 +1,10 @@
-﻿using Idefix.Core.Agent;
-
-namespace Idefix.Core.Settings;
+﻿namespace Idefix.Core.Settings;
 
 public sealed record IdefixSettings(
     string FirstName,
     string RootDirectory,
     LlmSettings Llm,
     string PrePrompt,
-    ContextMode ContextMode,
     AppTheme Theme,
     AppLanguage Language,
     bool NightlyUpdates,
@@ -18,7 +15,6 @@ public sealed record IdefixSettings(
         Path.Combine(userProfileDirectory, "IdefixKnowledge"),
         LlmSettings.Default,
         string.Empty,
-        ContextMode.Chunks,
         AppTheme.System,
         AppLanguage.System,
         NightlyUpdates: false,

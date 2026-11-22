@@ -14,5 +14,4 @@ namespace Idefix.Infrastructure.Persistence;
 [JsonSerializable(typeof(ChatSession))]
 [JsonSerializable(typeof(List<Project>))]
 [JsonSerializable(typeof(ModelList))]
-[JsonSerializable(typeof(IReadOnlyCollection<string>))]
 internal sealed partial class IdefixJsonContext : JsonSerializerContext;

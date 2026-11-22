@@ -40,6 +40,7 @@ public sealed class FileSystemKnowledgeCatalog : IKnowledgeCatalog
 
         return Directory.EnumerateFiles(plugin.DirectoryPath, "*", Recursive)
             .Where(KnowledgeLayout.IsSupportedDocument)
+            .Where(path => !KnowledgeLayout.IsInMarkdownFolder(Path.GetRelativePath(plugin.DirectoryPath, path)))
             .Select(path => new FileInfo(path))
             .Select(file => new KnowledgeDocument(
                 plugin.Name,

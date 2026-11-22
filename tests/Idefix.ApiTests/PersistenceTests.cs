@@ -22,7 +22,7 @@ public sealed class PersistenceTests : IDisposable
         var store = new DpapiSettingsStore(path);
         var settings = IdefixSettings.CreateDefault(this.root.Path, "Anna") with
         {
-            Llm = new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost:11434/v1/"), "secret-key-123", "llama3.3", "nomic-embed-text"),
+            Llm = new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost:11434/v1/"), "secret-key-123", "llama3.3", MaxContextTokens: 524_288),
             NightlyUpdates = true,
             DisabledPlugins = ["Medizin"],
         };
@@ -56,7 +56,7 @@ public sealed class PersistenceTests : IDisposable
                 ChatRole.Assistant,
                 "Drei Monate [Mietrecht.pdf, p. 2].",
                 DateTimeOffset.UtcNow,
-                [new TraceStep(1, "Kündigungsfrist", ["Recht"], 1, ["Mietrecht.pdf, p. 2"])],
+                new ContextSummary(["Recht/Mietrecht.pdf"], 1234),
                 [new Citation("Mietrecht.pdf", 2, "Recht/Mietrecht.pdf", 1, 3)]));
 
         await store.SaveProjectAsync(project, this.cancellation);
@@ -68,7 +68,8 @@ public sealed class PersistenceTests : IDisposable
         Assert.Equal(["Recht"], loadedProject.PluginScope!);
         Assert.Equal("Wie lange ist die Kündigungsfrist?", loadedSession.Title);
         Assert.Equal(session.Messages[1].Citations, loadedSession.Messages[1].Citations);
-        Assert.Equal(session.Messages[1].Trace[0].Sources, loadedSession.Messages[1].Trace[0].Sources);
+        Assert.Equal(session.Messages[1].Context!.Documents, loadedSession.Messages[1].Context!.Documents);
+        Assert.Equal(1234, loadedSession.Messages[1].Context!.EstimatedTokens);
     }
 
     [Fact]

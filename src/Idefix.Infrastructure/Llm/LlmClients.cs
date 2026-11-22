@@ -1,15 +1,17 @@
 ﻿using System.ClientModel;
 using System.ClientModel.Primitives;
 using Idefix.Core.Settings;
-using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using OpenAI;
 
 namespace Idefix.Infrastructure.Llm;
 
-public sealed record LlmClients(Kernel Kernel, IEmbeddingGenerator<string, Embedding<float>> Embeddings)
+public static class LlmClients
 {
-    public static LlmClients Create(LlmSettings settings, HttpClient httpClient)
+    // Shared or CPU-bound servers can queue a long prompt for minutes before the first byte arrives.
+    public static readonly TimeSpan RequestTimeout = TimeSpan.FromMinutes(5);
+
+    public static Kernel CreateKernel(LlmSettings settings, HttpClient httpClient)
     {
         var client = new OpenAIClient(
             new ApiKeyCredential(string.IsNullOrWhiteSpace(settings.ApiKey) ? "not-set" : settings.ApiKey),
@@ -17,11 +19,12 @@ public sealed record LlmClients(Kernel Kernel, IEmbeddingGenerator<string, Embed
             {
                 Endpoint = settings.EffectiveEndpoint,
                 Transport = new HttpClientPipelineTransport(httpClient),
+                NetworkTimeout = RequestTimeout,
+                RetryPolicy = new ClientRetryPolicy(maxRetries: 1),
             });
 
         var builder = Kernel.CreateBuilder();
         builder.AddOpenAIChatCompletion(settings.ChatModel, client);
-        var embeddings = client.GetEmbeddingClient(settings.EmbeddingModel).AsIEmbeddingGenerator();
-        return new LlmClients(builder.Build(), embeddings);
+        return builder.Build();
     }
 }
