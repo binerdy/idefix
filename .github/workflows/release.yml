@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      PACK_ID: Idefix
+      MAIN_EXE: Idefix.App.exe
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Validate SemVer tag on main
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ($tag -notmatch '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') { throw "Tag '$tag' is not a stable SemVer tag (vMAJOR.MINOR.PATCH)." }
+          git fetch origin main
+          git merge-base --is-ancestor "${{ github.sha }}" origin/main
+          if ($LASTEXITCODE -ne 0) { throw "Tag '$tag' does not point to a commit on main." }
+          "version=$($tag.Substring(1))" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Test
+        run: dotnet test --solution Idefix.slnx -c Release
+
+      - name: Publish
+        run: >
+          dotnet publish src/Idefix.App/Idefix.App.csproj -c Release
+          -f net11.0-windows10.0.26100 -p:Platform=x64 -p:PublishProfile=win-x64
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish
+
+      - name: Import signing certificate
+        id: signing
+        shell: pwsh
+        env:
+          SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrEmpty($env:SIGNING_CERTIFICATE)) {
+            Write-Warning "SIGNING_CERTIFICATE is not set; the release will be unsigned."
+            "params=" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          $path = Join-Path $env:RUNNER_TEMP "signing.pfx"
+          [IO.File]::WriteAllBytes($path, [Convert]::FromBase64String($env:SIGNING_CERTIFICATE))
+          "params=/f `"$path`" /p `"$env:SIGNING_PASSWORD`" /fd sha256 /tr http://timestamp.digicert.com /td sha256" >> $env:GITHUB_OUTPUT
+
+      - name: Pack and release with Velopack
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SIGN_PARAMS: ${{ steps.signing.outputs.params }}
+        run: |
+          $repo = "${{ github.server_url }}/${{ github.repository }}"
+          $version = "${{ steps.version.outputs.version }}"
+          dotnet tool install -g vpk --version 1.2.161
+          vpk download github --repoUrl $repo --token $env:GITHUB_TOKEN
+          $sign = @()
+          if ($env:SIGN_PARAMS) { $sign = @("--signParams", $env:SIGN_PARAMS) }
+          vpk pack --packId $env:PACK_ID --packVersion $version --packDir publish --mainExe $env:MAIN_EXE --packTitle Idefix @sign
+          vpk upload github --repoUrl $repo --token $env:GITHUB_TOKEN --publish `
+            --releaseName "Idefix $version" --tag "v$version" --targetCommitish "${{ github.sha }}"

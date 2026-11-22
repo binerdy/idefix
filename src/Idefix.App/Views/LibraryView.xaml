@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="Idefix.App.Views.LibraryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Idefix.App.Controls"
+             xmlns:vm="using:Idefix.App.ViewModels"
+             xmlns:services="using:Idefix.App.Services">
+
+  <ScrollViewer Padding="24,0" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+    <controls:CenteredColumn ColumnWidth="{StaticResource StageMaxWidth}">
+    <StackPanel Spacing="16" Margin="0,64,0,32">
+      <TextBlock Text="{x:Bind services:Strings.Get('Library')}" Style="{StaticResource PageTitleStyle}" />
+      <TextBlock Text="{x:Bind services:Strings.Get('LibraryHint')}" Style="{StaticResource HintTextStyle}" FontSize="14" />
+
+      <Grid ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel VerticalAlignment="Center">
+          <TextBlock Text="{x:Bind services:Strings.Get('RootFolder')}" FontWeight="SemiBold" />
+          <TextBlock Text="{x:Bind ViewModel.RootDirectory, Mode=OneWay}" Style="{StaticResource HintTextStyle}" IsTextSelectionEnabled="True" />
+        </StackPanel>
+        <Button Grid.Column="1" Content="{x:Bind services:Strings.Get('OpenFolder')}" Command="{x:Bind ViewModel.OpenRootCommand}" />
+        <Button Grid.Column="2" Content="{x:Bind services:Strings.Get('Reindex')}" Command="{x:Bind ViewModel.ReindexCommand}" />
+      </Grid>
+
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ProgressRing Width="14" Height="14" IsActive="{x:Bind ViewModel.Services.IsIndexing, Mode=OneWay}" />
+        <TextBlock Text="{x:Bind ViewModel.Services.IndexStatus, Mode=OneWay}" Style="{StaticResource HintTextStyle}" />
+      </StackPanel>
+
+      <TextBlock Text="{x:Bind services:Strings.Get('NoPlugins')}" Style="{StaticResource HintTextStyle}" FontSize="14"
+                 Visibility="{x:Bind ViewModel.HasNoPlugins, Mode=OneWay}" />
+
+      <ItemsControl ItemsSource="{x:Bind ViewModel.Plugins}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:LibraryPluginViewModel">
+            <Border Background="{ThemeResource PillBackgroundBrush}" BorderBrush="{ThemeResource PillBorderBrush}" BorderThickness="1"
+                    CornerRadius="14" Padding="16,12" Margin="0,0,0,8">
+              <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <FontIcon Glyph="&#xE8B7;" Style="{StaticResource IconGlyphStyle}" FontSize="20" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="{x:Bind Name}" FontSize="15" FontWeight="Medium" />
+                  <TextBlock Text="{x:Bind Documents}" Style="{StaticResource HintTextStyle}" />
+                </StackPanel>
+                <Button Grid.Column="2" Style="{StaticResource GhostButtonStyle}" Command="{x:Bind OpenFolderCommand}"
+                        ToolTipService.ToolTip="{x:Bind services:Strings.Get('OpenFolder')}" AutomationProperties.Name="{x:Bind services:Strings.Get('OpenFolder')}">
+                  <FontIcon Glyph="&#xE838;" Style="{StaticResource IconGlyphStyle}" />
+                </Button>
+                <ToggleSwitch Grid.Column="3" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0" AutomationProperties.Name="{x:Bind Name}" />
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+    </controls:CenteredColumn>
+  </ScrollViewer>
+</UserControl>

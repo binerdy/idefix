@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NewChat" xml:space="preserve">
+    <value>Neuer Chat</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Bibliothek</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projekte</value>
+  </data>
+  <data name="Chats" xml:space="preserve">
+    <value>Chats</value>
+  </data>
+  <data name="NewProject" xml:space="preserve">
+    <value>Neues Projekt</value>
+  </data>
+  <data name="SearchChats" xml:space="preserve">
+    <value>Chats durchsuchen</value>
+  </data>
+  <data name="ToggleSidebar" xml:space="preserve">
+    <value>Seitenleiste ein-/ausblenden</value>
+  </data>
+  <data name="GreetingFormat" xml:space="preserve">
+    <value>Hallo {0}, was schauen wir uns heute an.</value>
+  </data>
+  <data name="AskPlaceholder" xml:space="preserve">
+    <value>Idefix fragen</value>
+  </data>
+  <data name="Think" xml:space="preserve">
+    <value>Nachdenken</value>
+  </data>
+  <data name="ThinkHint" xml:space="preserve">
+    <value>Gründliche agentische Suche (Ping-Pong) statt schneller Suche</value>
+  </data>
+  <data name="Dictate" xml:space="preserve">
+    <value>Diktieren</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Senden</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stopp</value>
+  </data>
+  <data name="PluginsForChat" xml:space="preserve">
+    <value>Wissens-Plugins für diesen Chat</value>
+  </data>
+  <data name="NoPlugins" xml:space="preserve">
+    <value>Noch keine Wissens-Plugins. Lege Ordner in deinem Wissensordner an.</value>
+  </data>
+  <data name="TraceTitleFormat" xml:space="preserve">
+    <value>{0}× gesucht</value>
+  </data>
+  <data name="TraceStepFormat" xml:space="preserve">
+    <value>«{0}» → {1} Passagen</value>
+  </data>
+  <data name="Searching" xml:space="preserve">
+    <value>Durchsuche Wissen …</value>
+  </data>
+  <data name="TemporaryChat" xml:space="preserve">
+    <value>Temporärer Chat (wird nicht gespeichert)</value>
+  </data>
+  <data name="OpenOriginal" xml:space="preserve">
+    <value>Originaldatei öffnen</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Schliessen</value>
+  </data>
+  <data name="PageFormat" xml:space="preserve">
+    <value>Seite {0} von {1}</value>
+  </data>
+  <data name="PreviousPage" xml:space="preserve">
+    <value>Vorherige Seite</value>
+  </data>
+  <data name="NextPage" xml:space="preserve">
+    <value>Nächste Seite</value>
+  </data>
+  <data name="DocumentMissing" xml:space="preserve">
+    <value>Das Dokument wurde im Wissensordner nicht gefunden.</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>Vorname</value>
+  </data>
+  <data name="RootFolder" xml:space="preserve">
+    <value>Wissensordner</value>
+  </data>
+  <data name="RootFolderHint" xml:space="preserve">
+    <value>Jeder Unterordner wird zu einem Wissens-Plugin. Deine Dateien werden nie verändert.</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Durchsuchen …</value>
+  </data>
+  <data name="LlmSection" xml:space="preserve">
+    <value>Sprachmodell</value>
+  </data>
+  <data name="Provider" xml:space="preserve">
+    <value>Anbieter</value>
+  </data>
+  <data name="ProviderOllama" xml:space="preserve">
+    <value>Ollama (lokal)</value>
+  </data>
+  <data name="ProviderOpenAI" xml:space="preserve">
+    <value>OpenAI</value>
+  </data>
+  <data name="ProviderCompatible" xml:space="preserve">
+    <value>OpenAI-kompatibel</value>
+  </data>
+  <data name="Endpoint" xml:space="preserve">
+    <value>Endpunkt</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API-Schlüssel</value>
+  </data>
+  <data name="ApiKeyHint" xml:space="preserve">
+    <value>Für jeden Anbieter nötig, auch für Ollama (bei lokaler Installation ein beliebiger Wert).</value>
+  </data>
+  <data name="ChatModel" xml:space="preserve">
+    <value>Chat-Modell</value>
+  </data>
+  <data name="EmbeddingModel" xml:space="preserve">
+    <value>Embedding-Modell</value>
+  </data>
+  <data name="DiscoverModels" xml:space="preserve">
+    <value>Modelle suchen</value>
+  </data>
+  <data name="ModelsFoundFormat" xml:space="preserve">
+    <value>{0} Modelle gefunden</value>
+  </data>
+  <data name="ModelsFailedFormat" xml:space="preserve">
+    <value>Modelle konnten nicht geladen werden: {0}</value>
+  </data>
+  <data name="Behaviour" xml:space="preserve">
+    <value>Verhalten</value>
+  </data>
+  <data name="PrePrompt" xml:space="preserve">
+    <value>Vor-Prompt</value>
+  </data>
+  <data name="PrePromptHint" xml:space="preserve">
+    <value>Steuert Idefix über alle Sitzungen hinweg.</value>
+  </data>
+  <data name="ContextMode" xml:space="preserve">
+    <value>Kontext für das Modell</value>
+  </data>
+  <data name="ContextChunks" xml:space="preserve">
+    <value>Ausschnitte (RAG)</value>
+  </data>
+  <data name="ContextFullFiles" xml:space="preserve">
+    <value>Ganze Dateien</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>Darstellung</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Design</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>Systemstandard</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Hell</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dunkel</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="LanguageSystem" xml:space="preserve">
+    <value>Systemstandard</value>
+  </data>
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageGerman" xml:space="preserve">
+    <value>Deutsch (Schweiz)</value>
+  </data>
+  <data name="Updates" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="NightlyOptIn" xml:space="preserve">
+    <value>Nightly-Builds erhalten</value>
+  </data>
+  <data name="NightlyHint" xml:space="preserve">
+    <value>Vorabversionen aus dem develop-Branch. Sie können instabil sein.</value>
+  </data>
+  <data name="VersionFormat" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="CheckUpdates" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="UpdateReady" xml:space="preserve">
+    <value>Ein Update ist bereit.</value>
+  </data>
+  <data name="RestartNow" xml:space="preserve">
+    <value>Jetzt neu starten</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>Idefix ist aktuell.</value>
+  </data>
+  <data name="UpdatesNotInstalled" xml:space="preserve">
+    <value>Updates gibt es nur für installierte Versionen.</value>
+  </data>
+  <data name="UpdateFailedFormat" xml:space="preserve">
+    <value>Update-Prüfung fehlgeschlagen: {0}</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>Gespeichert.</value>
+  </data>
+  <data name="IndexingFormat" xml:space="preserve">
+    <value>Indexiere {0}/{1} …</value>
+  </data>
+  <data name="IndexIdle" xml:space="preserve">
+    <value>Index aktuell</value>
+  </data>
+  <data name="IndexFailedFormat" xml:space="preserve">
+    <value>Indexierung fehlgeschlagen: {0}</value>
+  </data>
+  <data name="IndexFailuresFormat" xml:space="preserve">
+    <value>{0} Dokumente konnten nicht indexiert werden: {1}</value>
+  </data>
+  <data name="Reindex" xml:space="preserve">
+    <value>Jetzt neu indexieren</value>
+  </data>
+  <data name="OpenFolder" xml:space="preserve">
+    <value>Ordner öffnen</value>
+  </data>
+  <data name="DocumentsFormat" xml:space="preserve">
+    <value>{0} Dokumente</value>
+  </data>
+  <data name="LibraryHint" xml:space="preserve">
+    <value>Wissens-Plugins sind die Ordner in deinem Wissensordner. Deaktivierte Plugins werden nie durchsucht.</value>
+  </data>
+  <data name="SetupRequired" xml:space="preserve">
+    <value>Vervollständige dein Profil: Anbieter, API-Schlüssel und Modelle.</value>
+  </data>
+  <data name="OpenProfile" xml:space="preserve">
+    <value>Profil öffnen</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Umbenennen</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="MoveToProject" xml:space="preserve">
+    <value>In Projekt verschieben</value>
+  </data>
+  <data name="NoProject" xml:space="preserve">
+    <value>Kein Projekt</value>
+  </data>
+  <data name="NewChatInProject" xml:space="preserve">
+    <value>Neuer Chat im Projekt</value>
+  </data>
+  <data name="ProjectPlugins" xml:space="preserve">
+    <value>Plugins für dieses Projekt …</value>
+  </data>
+  <data name="ProjectPluginsHint" xml:space="preserve">
+    <value>Alle leer lassen, um jedes aktivierte Plugin zu verwenden.</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Untitled" xml:space="preserve">
+    <value>Neuer Chat</value>
+  </data>
+  <data name="DictationUnavailable" xml:space="preserve">
+    <value>Diktieren ist nicht verfügbar. Prüfe Mikrofon und Sprach-Datenschutzeinstellungen.</value>
+  </data>
+  <data name="AnswerFailedFormat" xml:space="preserve">
+    <value>Das Modell konnte nicht antworten: {0}</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Quellen</value>
+  </data>
+  <data name="SplashLoadingProfile" xml:space="preserve">
+    <value>Lade Profil …</value>
+  </data>
+  <data name="SplashSearchingFolders" xml:space="preserve">
+    <value>Idefix durchsucht deine Ordner …</value>
+  </data>
+  <data name="SplashFoundFormat" xml:space="preserve">
+    <value>{0} Dokumente in {1} Plugins gefunden</value>
+  </data>
+  <data name="SplashCheckingIndex" xml:space="preserve">
+    <value>Prüfe den Index …</value>
+  </data>
+  <data name="SplashIndexFormat" xml:space="preserve">
+    <value>{0} Dokumente indexiert</value>
+  </data>
+  <data name="SplashLoadingChats" xml:space="preserve">
+    <value>Lade Chats …</value>
+  </data>
+  <data name="SplashCheckingUpdates" xml:space="preserve">
+    <value>Suche nach Updates …</value>
+  </data>
+  <data name="SplashReady" xml:space="preserve">
+    <value>Bereit.</value>
+  </data>
+</root>

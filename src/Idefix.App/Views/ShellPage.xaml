@@ -1,0 +1,188 @@
+﻿<Page x:Class="Idefix.App.Views.ShellPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:Idefix.App.Controls"
+      xmlns:views="using:Idefix.App.Views"
+      xmlns:vm="using:Idefix.App.ViewModels"
+      xmlns:services="using:Idefix.App.Services"
+      FontFamily="{StaticResource InterFontFamily}"
+      Background="{ThemeResource StageBackgroundBrush}">
+
+  <Grid x:Name="Root">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <Grid x:Name="Sidebar"
+          Width="{StaticResource SidebarWidth}"
+          Visibility="{x:Bind ViewModel.IsSidebarOpen, Mode=OneWay}"
+          Background="{ThemeResource SidebarBackgroundBrush}"
+          BorderBrush="{ThemeResource SidebarBorderBrush}"
+          BorderThickness="0,0,1,0"
+          Padding="8,10,8,8">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <Grid Margin="4,0,0,8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Button Style="{StaticResource GhostButtonStyle}" Padding="4"
+                Command="{x:Bind ViewModel.OpenProfileCommand}"
+                ToolTipService.ToolTip="{x:Bind services:Strings.Get('Profile')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Profile')}">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <PersonPicture Width="30" Height="30" Initials="{x:Bind ViewModel.Initials, Mode=OneWay}" />
+            <TextBlock Text="{x:Bind ViewModel.FirstName, Mode=OneWay}" FontSize="15" VerticalAlignment="Center" FontWeight="Medium" />
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="1" Style="{StaticResource GhostButtonStyle}"
+                Command="{x:Bind ViewModel.ToggleSearchCommand}"
+                ToolTipService.ToolTip="{x:Bind services:Strings.Get('SearchChats')}" AutomationProperties.Name="{x:Bind services:Strings.Get('SearchChats')}">
+          <FontIcon Glyph="&#xE721;" Style="{StaticResource IconGlyphStyle}" />
+        </Button>
+        <Button Grid.Column="2" Style="{StaticResource GhostButtonStyle}"
+                Command="{x:Bind ViewModel.ToggleSidebarCommand}"
+                ToolTipService.ToolTip="{x:Bind services:Strings.Get('ToggleSidebar')}" AutomationProperties.Name="{x:Bind services:Strings.Get('ToggleSidebar')}">
+          <FontIcon Glyph="&#xE89F;" Style="{StaticResource IconGlyphStyle}" />
+        </Button>
+      </Grid>
+
+      <TextBox Grid.Row="1" Margin="4,0,4,8"
+               Visibility="{x:Bind ViewModel.IsSearchOpen, Mode=OneWay}"
+               PlaceholderText="{x:Bind services:Strings.Get('SearchChats')}"
+               Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+      <StackPanel Grid.Row="2" Spacing="2">
+        <Button Style="{StaticResource SidebarItemButtonStyle}"
+                Background="{ThemeResource SubtleFillBrush}"
+                Command="{x:Bind ViewModel.NewChatCommand}"
+                AutomationProperties.Name="{x:Bind services:Strings.Get('NewChat')}">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <FontIcon Glyph="&#xE70F;" Style="{StaticResource IconGlyphStyle}" />
+            <TextBlock Text="{x:Bind services:Strings.Get('NewChat')}" FontSize="15" />
+          </StackPanel>
+        </Button>
+        <Button Style="{StaticResource SidebarItemButtonStyle}" Command="{x:Bind ViewModel.OpenLibraryCommand}"
+                AutomationProperties.Name="{x:Bind services:Strings.Get('Library')}">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <FontIcon Glyph="&#xE8F1;" Style="{StaticResource IconGlyphStyle}" />
+            <TextBlock Text="{x:Bind services:Strings.Get('Library')}" FontSize="15" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+
+      <ScrollViewer Grid.Row="3" Margin="0,8,0,0" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+          <ItemsControl ItemsSource="{x:Bind ViewModel.LooseSessions}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:SessionItemViewModel">
+                <Button Style="{StaticResource SidebarItemButtonStyle}" Padding="12,6"
+                        Click="OnSessionClicked" Tag="{x:Bind}"
+                        RightTapped="OnSessionRightTapped">
+                  <TextBlock Text="{x:Bind Title, Mode=OneWay}" TextTrimming="CharacterEllipsis" FontSize="14"
+                             FontWeight="{x:Bind views:ShellPage.WeightFor(IsSelected), Mode=OneWay}" />
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Grid Margin="0,8,0,0">
+            <TextBlock Text="{x:Bind services:Strings.Get('Projects')}" Style="{StaticResource SectionHeaderStyle}" />
+            <Button HorizontalAlignment="Right" Style="{StaticResource GhostButtonStyle}" Padding="6" Margin="0,8,4,0"
+                    Click="OnNewProjectClicked" ToolTipService.ToolTip="{x:Bind services:Strings.Get('NewProject')}" AutomationProperties.Name="{x:Bind services:Strings.Get('NewProject')}">
+              <FontIcon Glyph="&#xE710;" FontSize="12" Style="{StaticResource IconGlyphStyle}" />
+            </Button>
+          </Grid>
+
+          <ItemsControl ItemsSource="{x:Bind ViewModel.Projects}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:ProjectItemViewModel">
+                <StackPanel>
+                  <Button Style="{StaticResource SidebarItemButtonStyle}" Padding="12,7"
+                          Tag="{x:Bind}" Command="{x:Bind ToggleCommand}" RightTapped="OnProjectRightTapped"
+                          AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                      <FontIcon Glyph="&#xE8B7;" Style="{StaticResource IconGlyphStyle}" />
+                      <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="15" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </Button>
+                  <ItemsControl ItemsSource="{x:Bind Sessions}" Visibility="{x:Bind IsExpanded, Mode=OneWay}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:SessionItemViewModel">
+                        <Button Style="{StaticResource SidebarItemButtonStyle}" Padding="40,4,12,4"
+                                Click="OnSessionClicked" Tag="{x:Bind}" RightTapped="OnSessionRightTapped"
+                        AutomationProperties.Name="{x:Bind Title, Mode=OneWay}">
+                          <TextBlock Text="{x:Bind Title, Mode=OneWay}" TextTrimming="CharacterEllipsis" FontSize="14"
+                                     FontWeight="{x:Bind views:ShellPage.WeightFor(IsSelected), Mode=OneWay}" />
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+
+      <StackPanel Grid.Row="4" Margin="12,8,12,4" Spacing="6">
+        <InfoBar IsOpen="{x:Bind ViewModel.Services.IsUpdateReady, Mode=OneWay}" IsClosable="True" Severity="Informational"
+                 Message="{x:Bind services:Strings.Get('UpdateReady')}">
+          <InfoBar.ActionButton>
+            <Button Content="{x:Bind services:Strings.Get('RestartNow')}" Click="OnRestartClicked" />
+          </InfoBar.ActionButton>
+        </InfoBar>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <ProgressRing Width="12" Height="12" IsActive="{x:Bind ViewModel.Services.IsIndexing, Mode=OneWay}" />
+          <TextBlock Text="{x:Bind ViewModel.Services.IndexStatus, Mode=OneWay}" Style="{StaticResource HintTextStyle}" TextWrapping="NoWrap"
+                     TextTrimming="CharacterEllipsis" MaxWidth="230" ToolTipService.ToolTip="{x:Bind ViewModel.Services.IndexStatus, Mode=OneWay}" />
+        </StackPanel>
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Column="1" x:Name="Stage">
+      <controls:CelestialLayer x:Name="Sky" />
+
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10" Spacing="2"
+                  Visibility="{x:Bind views:ViewHelpers.CollapsedWhen(ViewModel.IsSidebarOpen), Mode=OneWay}">
+        <Button Style="{StaticResource GhostButtonStyle}" Command="{x:Bind ViewModel.ToggleSidebarCommand}"
+                ToolTipService.ToolTip="{x:Bind services:Strings.Get('ToggleSidebar')}" AutomationProperties.Name="{x:Bind services:Strings.Get('ToggleSidebar')}">
+          <FontIcon Glyph="&#xE8A0;" Style="{StaticResource IconGlyphStyle}" />
+        </Button>
+        <Button Style="{StaticResource GhostButtonStyle}" Command="{x:Bind ViewModel.NewChatCommand}"
+                ToolTipService.ToolTip="{x:Bind services:Strings.Get('NewChat')}" AutomationProperties.Name="{x:Bind services:Strings.Get('NewChat')}">
+          <FontIcon Glyph="&#xE70F;" Style="{StaticResource IconGlyphStyle}" />
+        </Button>
+      </StackPanel>
+
+      <Border x:Name="TitleBarDragRegion" x:FieldModifier="public" Height="40" VerticalAlignment="Top" Margin="100,0,200,0" Background="Transparent" />
+
+      <ToggleButton HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,150,0" Padding="8"
+                    Background="Transparent" BorderThickness="0" CornerRadius="8"
+                    Visibility="{x:Bind ViewModel.IsChat, Mode=OneWay}"
+                    IsChecked="{x:Bind ViewModel.IsTemporaryChat, Mode=OneWay}"
+                    Command="{x:Bind ViewModel.ToggleTemporaryChatCommand}"
+                    ToolTipService.ToolTip="{x:Bind services:Strings.Get('TemporaryChat')}" AutomationProperties.Name="{x:Bind services:Strings.Get('TemporaryChat')}">
+        <FontIcon Glyph="&#xE727;" Style="{StaticResource IconGlyphStyle}" />
+      </ToggleButton>
+
+      <views:ChatView Margin="0,56,0,0" ViewModel="{x:Bind ViewModel.Chat, Mode=OneWay}"
+                      Visibility="{x:Bind ViewModel.IsChat, Mode=OneWay}"
+                      CitationRequested="OnCitationRequested"
+                      ProfileRequested="OnProfileRequested" />
+      <views:LibraryView ViewModel="{x:Bind ViewModel.Library}" Visibility="{x:Bind ViewModel.IsLibrary, Mode=OneWay}" />
+      <views:ProfileView x:Name="Profile" x:FieldModifier="public" ViewModel="{x:Bind ViewModel.Profile}" Visibility="{x:Bind ViewModel.IsProfile, Mode=OneWay}" />
+    </Grid>
+
+    <views:DocumentViewer Grid.ColumnSpan="2" ViewModel="{x:Bind ViewModel.Viewer}"
+                          Visibility="{x:Bind ViewModel.Viewer.IsOpen, Mode=OneWay}" />
+  </Grid>
+</Page>

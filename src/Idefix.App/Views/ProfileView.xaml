@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="Idefix.App.Views.ProfileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Idefix.App.Controls"
+             xmlns:views="using:Idefix.App.Views"
+             xmlns:services="using:Idefix.App.Services">
+
+  <ScrollViewer Padding="24,0" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
+    <controls:CenteredColumn ColumnWidth="{StaticResource StageMaxWidth}">
+    <StackPanel Spacing="18" Margin="0,64,0,40">
+      <SelectorBar x:Name="Tabs" SelectionChanged="OnTabChanged">
+        <SelectorBarItem x:Name="ProfileTab" Text="{x:Bind services:Strings.Get('Profile')}" IsSelected="True" />
+        <SelectorBarItem x:Name="SettingsTab" Text="{x:Bind services:Strings.Get('Settings')}" />
+      </SelectorBar>
+
+      <InfoBar IsOpen="{x:Bind ViewModel.NeedsSetup, Mode=OneWay}" IsClosable="False" Severity="Informational"
+               Message="{x:Bind services:Strings.Get('SetupRequired')}" />
+
+      <StackPanel x:Name="ProfilePanel" Spacing="18">
+        <TextBox Header="{x:Bind services:Strings.Get('FirstName')}" Text="{x:Bind ViewModel.FirstName, Mode=TwoWay}" />
+
+        <StackPanel Spacing="6">
+          <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Header="{x:Bind services:Strings.Get('RootFolder')}" Text="{x:Bind ViewModel.RootDirectory, Mode=TwoWay}" />
+            <Button Grid.Column="1" VerticalAlignment="Bottom" Content="{x:Bind services:Strings.Get('Browse')}" Click="OnBrowseClicked" />
+          </Grid>
+          <TextBlock Text="{x:Bind services:Strings.Get('RootFolderHint')}" Style="{StaticResource HintTextStyle}" />
+        </StackPanel>
+
+        <TextBlock Text="{x:Bind services:Strings.Get('LlmSection')}" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+        <ComboBox Header="{x:Bind services:Strings.Get('Provider')}" ItemsSource="{x:Bind ViewModel.Providers}"
+                  SelectedIndex="{x:Bind ViewModel.ProviderIndex, Mode=TwoWay}" MinWidth="260" />
+        <TextBox Header="{x:Bind services:Strings.Get('Endpoint')}" Text="{x:Bind ViewModel.Endpoint, Mode=TwoWay}"
+                 PlaceholderText="http://localhost:11434/v1/" />
+        <StackPanel Spacing="6">
+          <PasswordBox Header="{x:Bind services:Strings.Get('ApiKey')}" Password="{x:Bind ViewModel.ApiKey, Mode=TwoWay}" />
+          <TextBlock Text="{x:Bind services:Strings.Get('ApiKeyHint')}" Style="{StaticResource HintTextStyle}" />
+        </StackPanel>
+        <Grid ColumnSpacing="12">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <ComboBox Header="{x:Bind services:Strings.Get('ChatModel')}" IsEditable="True" HorizontalAlignment="Stretch"
+                    ItemsSource="{x:Bind ViewModel.AvailableModels}" Text="{x:Bind ViewModel.ChatModel, Mode=TwoWay}" />
+          <ComboBox Grid.Column="1" Header="{x:Bind services:Strings.Get('EmbeddingModel')}" IsEditable="True" HorizontalAlignment="Stretch"
+                    ItemsSource="{x:Bind ViewModel.AvailableModels}" Text="{x:Bind ViewModel.EmbeddingModel, Mode=TwoWay}" />
+        </Grid>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <Button Content="{x:Bind services:Strings.Get('DiscoverModels')}" Command="{x:Bind ViewModel.DiscoverModelsCommand}" />
+          <ProgressRing Width="16" Height="16" IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
+        </StackPanel>
+
+        <TextBlock Text="{x:Bind services:Strings.Get('Behaviour')}" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+        <StackPanel Spacing="6">
+          <TextBox Header="{x:Bind services:Strings.Get('PrePrompt')}" Text="{x:Bind ViewModel.PrePrompt, Mode=TwoWay}"
+                   AcceptsReturn="True" TextWrapping="Wrap" MinHeight="110" />
+          <TextBlock Text="{x:Bind services:Strings.Get('PrePromptHint')}" Style="{StaticResource HintTextStyle}" />
+        </StackPanel>
+        <RadioButtons Header="{x:Bind services:Strings.Get('ContextMode')}" MaxColumns="2">
+          <RadioButton Content="{x:Bind services:Strings.Get('ContextChunks')}" IsChecked="{x:Bind views:ViewHelpers.Not(ViewModel.UseFullFiles), Mode=OneWay}" />
+          <RadioButton Content="{x:Bind services:Strings.Get('ContextFullFiles')}" IsChecked="{x:Bind ViewModel.UseFullFiles, Mode=TwoWay}" />
+        </RadioButtons>
+      </StackPanel>
+
+      <StackPanel x:Name="SettingsPanel" Spacing="18" Visibility="Collapsed">
+        <TextBlock Text="{x:Bind services:Strings.Get('Appearance')}" FontSize="18" FontWeight="SemiBold" />
+        <ComboBox Header="{x:Bind services:Strings.Get('Theme')}" ItemsSource="{x:Bind ViewModel.Themes}"
+                  SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}" MinWidth="260" />
+        <ComboBox Header="{x:Bind services:Strings.Get('Language')}" ItemsSource="{x:Bind ViewModel.Languages}"
+                  SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}" MinWidth="260" />
+
+        <TextBlock Text="{x:Bind services:Strings.Get('Updates')}" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+        <StackPanel Spacing="4">
+          <ToggleSwitch Header="{x:Bind services:Strings.Get('NightlyOptIn')}" IsOn="{x:Bind ViewModel.NightlyUpdates, Mode=TwoWay}" />
+          <TextBlock Text="{x:Bind services:Strings.Get('NightlyHint')}" Style="{StaticResource HintTextStyle}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <Button Content="{x:Bind services:Strings.Get('CheckUpdates')}" Command="{x:Bind ViewModel.CheckUpdatesCommand}" />
+          <TextBlock Text="{x:Bind ViewModel.UpdateStatus, Mode=OneWay}" VerticalAlignment="Center" Style="{StaticResource HintTextStyle}" />
+        </StackPanel>
+        <TextBlock Text="{x:Bind ViewModel.Version}" Style="{StaticResource HintTextStyle}" IsTextSelectionEnabled="True" />
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+        <Button Style="{StaticResource AccentButtonStyle}" Content="{x:Bind services:Strings.Get('Save')}" Command="{x:Bind ViewModel.SaveCommand}" />
+        <TextBlock Text="{x:Bind ViewModel.Status, Mode=OneWay}" VerticalAlignment="Center" Style="{StaticResource HintTextStyle}" />
+      </StackPanel>
+    </StackPanel>
+    </controls:CenteredColumn>
+  </ScrollViewer>
+</UserControl>
