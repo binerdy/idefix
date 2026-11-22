@@ -2,10 +2,15 @@ name: Release
 
 on:
   push:
-    tags: ["v*.*.*"]
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -18,32 +23,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate SemVer tag on main
+      - name: Read version from Directory.Build.props
         id: version
         shell: pwsh
         run: |
-          $tag = "${{ github.ref_name }}"
-          if ($tag -notmatch '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') { throw "Tag '$tag' is not a stable SemVer tag (vMAJOR.MINOR.PATCH)." }
-          git fetch origin main
-          git merge-base --is-ancestor "${{ github.sha }}" origin/main
-          if ($LASTEXITCODE -ne 0) { throw "Tag '$tag' does not point to a commit on main." }
-          "version=$($tag.Substring(1))" >> $env:GITHUB_OUTPUT
+          $v = ./.github/scripts/Get-IdefixVersion.ps1
+          if ($v.Released) { "::notice::$($v.Tag) already exists; nothing to release." }
+          else { "Releasing $($v.Tag)." }
 
       - uses: actions/setup-dotnet@v6
+        if: steps.version.outputs.released == 'false'
         with:
           global-json-file: global.json
 
       - name: Test
+        if: steps.version.outputs.released == 'false'
         run: dotnet test --solution Idefix.slnx -c Release
 
       - name: Publish
+        if: steps.version.outputs.released == 'false'
         run: >
           dotnet publish src/Idefix.App/Idefix.App.csproj -c Release
           -f net11.0-windows10.0.26100 -p:Platform=x64 -p:PublishProfile=win-x64
-          -p:Version=${{ steps.version.outputs.version }}
           -o publish
 
       - name: Import signing certificate
+        if: steps.version.outputs.released == 'false'
         id: signing
         shell: pwsh
         env:
@@ -60,6 +65,7 @@ jobs:
           "params=/f `"$path`" /p `"$env:SIGNING_PASSWORD`" /fd sha256 /tr http://timestamp.digicert.com /td sha256" >> $env:GITHUB_OUTPUT
 
       - name: Pack and release with Velopack
+        if: steps.version.outputs.released == 'false'
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -73,4 +79,4 @@ jobs:
           if ($env:SIGN_PARAMS) { $sign = @("--signParams", $env:SIGN_PARAMS) }
           vpk pack --packId $env:PACK_ID --packVersion $version --packDir publish --mainExe $env:MAIN_EXE --packTitle Idefix @sign
           vpk upload github --repoUrl $repo --token $env:GITHUB_TOKEN --publish `
-            --releaseName "Idefix $version" --tag "v$version" --targetCommitish "${{ github.sha }}"
+            --releaseName "Idefix $version" --tag "${{ steps.version.outputs.tag }}" --targetCommitish "${{ github.sha }}"

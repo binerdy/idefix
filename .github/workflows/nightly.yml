@@ -42,8 +42,9 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          $base = ([regex]'<Version[^>]*>([^<]+)</Version>').Match((Get-Content Directory.Build.props -Raw)).Groups[1].Value
-          "version=$base-nightly.${{ github.run_number }}" >> $env:GITHUB_OUTPUT
+          $v = ./.github/scripts/Get-IdefixVersion.ps1
+          if ($v.Released) { throw "$($v.Tag) is already released; nightlies would sort below it. Bump <Version> in Directory.Build.props on develop." }
+          "version=$($v.Version)-nightly.${{ github.run_number }}" >> $env:GITHUB_OUTPUT
 
       - name: Test
         if: steps.changes.outputs.changed == 'True'

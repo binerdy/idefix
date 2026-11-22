@@ -2,6 +2,8 @@
 
 <Project>
   <PropertyGroup>
+    <!-- Single source of truth: main releases v$(Version), develop nightlies publish $(Version)-nightly.N. -->
+    <Version Condition="'$(Version)' == ''">0.1.0</Version>
     <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
@@ -20,7 +22,6 @@
     <Product>Idefix</Product>
     <Copyright>Copyright (c) Idefix contributors</Copyright>
     <RepositoryUrl>https://github.com/binerdy/idefix</RepositoryUrl>
-    <Version Condition="'$(Version)' == ''">0.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
