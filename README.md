@@ -50,8 +50,12 @@ $env:IDEFIX_DATA_DIR = "$env:TEMP\idefix-dev"; dotnet run --project src/Idefix.A
 
 ## Releases
 
-- `develop` → nightly pre-release `vX.Y.Z-nightly.<run>` (only when `develop` changed).
-- Tag `vX.Y.Z` on `main` → stable release. Set the `SIGNING_CERTIFICATE` (base64 PFX) and `SIGNING_PASSWORD` secrets to sign binaries.
+`<Version>` in `Directory.Build.props` is the single source of truth.
+
+- **Merge into `main`** → the Release workflow publishes `v<Version>` if that tag does not exist yet. Pull requests into `main` fail when `<Version>` is already released.
+- **`develop`** → a nightly pre-release `v<Version>-nightly.<run>` when `develop` changed in the last 24 hours.
+- **After a release**, bump `<Version>` on `develop` to the next version; nightlies refuse to build an already released version because updaters would ignore them.
+- Set the `SIGNING_CERTIFICATE` (base64 PFX) and `SIGNING_PASSWORD` secrets to sign binaries.
 
 ## Contributing
 
