@@ -300,4 +300,28 @@
   <data name="Sources" xml:space="preserve">
     <value>Quellen</value>
   </data>
+  <data name="SplashLoadingProfile" xml:space="preserve">
+    <value>Lade Profil …</value>
+  </data>
+  <data name="SplashSearchingFolders" xml:space="preserve">
+    <value>Idefix durchsucht deine Ordner …</value>
+  </data>
+  <data name="SplashFoundFormat" xml:space="preserve">
+    <value>{0} Dokumente in {1} Plugins gefunden</value>
+  </data>
+  <data name="SplashCheckingIndex" xml:space="preserve">
+    <value>Prüfe den Index …</value>
+  </data>
+  <data name="SplashIndexFormat" xml:space="preserve">
+    <value>{0} Dokumente indexiert</value>
+  </data>
+  <data name="SplashLoadingChats" xml:space="preserve">
+    <value>Lade Chats …</value>
+  </data>
+  <data name="SplashCheckingUpdates" xml:space="preserve">
+    <value>Suche nach Updates …</value>
+  </data>
+  <data name="SplashReady" xml:space="preserve">
+    <value>Bereit.</value>
+  </data>
 </root>

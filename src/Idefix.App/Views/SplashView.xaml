@@ -1,0 +1,20 @@
+<UserControl x:Class="Idefix.App.Views.SplashView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Idefix.App.Controls"
+             xmlns:vm="using:Idefix.App.ViewModels"
+             FontFamily="{StaticResource InterFontFamily}"
+             RequestedTheme="Dark">
+
+  <Grid Background="#0F1115">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+      <controls:PixelMatrix Width="320" Height="310" />
+      <TextBlock Text="Idefix" FontSize="40" FontWeight="SemiBold" Foreground="#F2F2F2" HorizontalAlignment="Center" Margin="0,8,0,0" />
+      <TextBlock Text="{x:Bind vm:SplashViewModel.Version}" FontSize="13" Foreground="#8A8F99" HorizontalAlignment="Center" />
+      <ProgressBar Width="320" Margin="0,22,0,0" Minimum="0" Maximum="1"
+                   Value="{x:Bind ViewModel.Progress, Mode=OneWay}" Foreground="#9FC8FF" Background="#23262D" />
+      <TextBlock Text="{x:Bind ViewModel.Status, Mode=OneWay}" FontSize="13" Foreground="#B4B9C2" HorizontalAlignment="Center"
+                 TextTrimming="CharacterEllipsis" MaxWidth="420" />
+    </StackPanel>
+  </Grid>
+</UserControl>

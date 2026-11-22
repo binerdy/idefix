@@ -15,6 +15,7 @@
     <DefaultLanguage>en</DefaultLanguage>
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);PRI257</MSBuildWarningsAsMessages>
     <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <UnoFeatures>Mvvm;</UnoFeatures>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
