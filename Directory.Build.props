@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <MSBuildTreatWarningsAsErrors>true</MSBuildTreatWarningsAsErrors>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
+    <Deterministic>true</Deterministic>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;NU1507;NETSDK1201;PRI257</NoWarn>
+    <Authors>binerdy</Authors>
+    <Product>Idefix</Product>
+    <Copyright>Copyright (c) Idefix contributors</Copyright>
+    <RepositoryUrl>https://github.com/binerdy/idefix</RepositoryUrl>
+    <Version Condition="'$(Version)' == ''">0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)external.globalconfig" />
+    <Compile Include="$(MSBuildThisFileDirectory)src/AssemblyInfo.cs" Link="Properties/AssemblyInfo.Shared.cs" />
+    <AssemblyAttribute Include="AssemblyMetadata">
+      <_Parameter1>BuildDate</_Parameter1>
+      <_Parameter2 Condition="'$(Configuration)'=='Release'">$([System.DateTime]::UtcNow.ToString("u"))</_Parameter2>
+      <_Parameter2 Condition="'$(Configuration)'!='Release'">$([System.DateTime]::Now.ToString("yyyy-MM-dd"))</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

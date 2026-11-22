@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1000" viewBox="0 0 1920 1000" font-family="Inter, 'Segoe UI', sans-serif">
+  <defs>
+    <filter id="pillShadow" x="-5%" y="-40%" width="110%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000" flood-opacity="0.06" />
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1000" fill="#FCFCFC" />
+
+  <rect width="430" height="1000" fill="#F7F7F7" />
+  <rect x="430" width="1" height="1000" fill="#ECECEC" />
+
+  <circle cx="38" cy="35" r="15" fill="#E6E6E6" />
+  <text x="38" y="40" font-size="14" font-weight="600" fill="#1A1A1A" text-anchor="middle">A</text>
+  <text x="62" y="41" font-size="18" fill="#1A1A1A">&lt;ProfileIcon&gt;</text>
+
+  <g fill="none" stroke="#3A3A3A" stroke-width="1.6" stroke-linecap="round">
+    <circle cx="341" cy="33" r="7.5" />
+    <line x1="346.5" y1="38.5" x2="352" y2="44" />
+    <rect x="387" y="25" width="21" height="18" rx="3.5" />
+    <line x1="394" y1="25" x2="394" y2="43" />
+  </g>
+
+  <rect x="13" y="78" width="410" height="43" rx="10" fill="#ECECEC" />
+  <g fill="none" stroke="#2A2A2A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M44,94 h-12 a3,3 0 0 0 -3,3 v10 a3,3 0 0 0 3,3 h10 a3,3 0 0 0 3,-3 v-6" />
+    <path d="M45.5,90.5 l3,3 l-9,9 h-3 v-3 z" />
+  </g>
+  <text x="58" y="106" font-size="18" fill="#1A1A1A">Neuer Chat</text>
+
+  <g fill="none" stroke="#2A2A2A" stroke-width="1.5" stroke-linejoin="round">
+    <rect x="28" y="132" width="5" height="16" rx="1" />
+    <rect x="35" y="132" width="5" height="16" rx="1" />
+    <path d="M42.5,133.5 l4.5,-1.2 l4,15.4 l-4.5,1.2 z" />
+  </g>
+  <text x="58" y="147" font-size="18" fill="#1A1A1A">Bibliothek</text>
+
+  <text x="25" y="731" font-size="16" font-weight="600" fill="#6E6E6E">Projekte</text>
+
+  <g fill="none" stroke="#2A2A2A" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M28,768 h7 l2.5,3 h11 a1.5,1.5 0 0 1 1.5,1.5 v9 a1.5,1.5 0 0 1 -1.5,1.5 h-19 a1.5,1.5 0 0 1 -1.5,-1.5 z" />
+    <line x1="28" y1="773" x2="50" y2="773" />
+    <path d="M28,858 h7 l2.5,3 h11 a1.5,1.5 0 0 1 1.5,1.5 v9 a1.5,1.5 0 0 1 -1.5,1.5 h-19 a1.5,1.5 0 0 1 -1.5,-1.5 z" />
+    <line x1="28" y1="863" x2="50" y2="863" />
+  </g>
+  <g font-size="18" fill="#1A1A1A">
+    <text x="62" y="784">Project</text>
+    <text x="58" y="817">Session 1</text>
+    <text x="58" y="839">Session 2</text>
+    <text x="66" y="874">Project B</text>
+    <text x="58" y="910">Session 1</text>
+    <text x="58" y="932">Session 2</text>
+    <text x="58" y="955">Session 3</text>
+  </g>
+
+  <g opacity="0.75">
+    <path d="M840,193 a33,33 0 1 0 15,48 a27,27 0 1 1 -15,-48 z" fill="#F1F1F4" stroke="#9A9AA4" stroke-width="1.2" />
+    <g fill="none" stroke="#B4B4BC" stroke-width="1">
+      <circle cx="808" cy="212" r="4" />
+      <circle cx="802" cy="230" r="3" />
+      <circle cx="818" cy="238" r="2.5" />
+    </g>
+  </g>
+  <g fill="none" stroke="#5A5A64" stroke-width="1.1" stroke-linejoin="round">
+    <path d="M583.0,328.0 L585.6,337.4 L595.0,340.0 L585.6,342.6 L583.0,352.0 L580.4,342.6 L571.0,340.0 L580.4,337.4 Z" />
+    <path d="M1076.0,357.0 L1078.2,364.8 L1086.0,367.0 L1078.2,369.2 L1076.0,377.0 L1073.8,369.2 L1066.0,367.0 L1073.8,364.8 Z" />
+    <path d="M1418.0,203.0 L1419.1,206.9 L1423.0,208.0 L1419.1,209.1 L1418.0,213.0 L1416.9,209.1 L1413.0,208.0 L1416.9,206.9 Z" />
+    <path d="M790.0,534.0 L791.3,538.7 L796.0,540.0 L791.3,541.3 L790.0,546.0 L788.7,541.3 L784.0,540.0 L788.7,538.7 Z" />
+    <path d="M1457.0,561.0 L1458.1,564.9 L1462.0,566.0 L1458.1,567.1 L1457.0,571.0 L1455.9,567.1 L1452.0,566.0 L1455.9,564.9 Z" />
+  </g>
+
+  <g fill="none" stroke="#3A3A3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1873,32 l3,-9 h14 l3,9" />
+    <line x1="1869" y1="32" x2="1897" y2="32" />
+    <circle cx="1876" cy="40" r="4" />
+    <circle cx="1890" cy="40" r="4" />
+    <line x1="1880" y1="40" x2="1886" y2="40" />
+  </g>
+
+  <text x="1176" y="845" font-size="22" fill="#1A1A1A" text-anchor="middle">Hallo &lt;Person.Vorname&gt;, was schauen wir uns heute an.</text>
+
+  <rect x="693" y="882" width="959" height="64" rx="32" fill="#FFFFFF" stroke="#E4E4E4" filter="url(#pillShadow)" />
+  <g stroke="#2A2A2A" stroke-width="1.8" stroke-linecap="round">
+    <line x1="717" y1="914" x2="735" y2="914" />
+    <line x1="726" y1="905" x2="726" y2="923" />
+  </g>
+  <text x="772" y="920" font-size="20" fill="#1A1A1A">Idefix fragen</text>
+
+  <g fill="none" stroke="#7A7A7A" stroke-width="1.4">
+    <circle cx="1394" cy="915" r="9" />
+    <path d="M1394,906 v18 M1389,909 q3,3 0,6 q-3,3 0,6 M1399,909 q-3,3 0,6 q3,3 0,6" />
+  </g>
+  <text x="1414" y="922" font-size="18" fill="#7A7A7A">Nachdenken</text>
+
+  <g fill="none" stroke="#2A2A2A" stroke-width="1.7" stroke-linecap="round">
+    <rect x="1561" y="902" width="9" height="15" rx="4.5" />
+    <path d="M1557,912 a8.5,8.5 0 0 0 17,0" />
+    <line x1="1565.5" y1="920.5" x2="1565.5" y2="926" />
+  </g>
+
+  <circle cx="1620" cy="914" r="22" fill="#111111" />
+  <g stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round">
+    <line x1="1611" y1="911" x2="1611" y2="917" />
+    <line x1="1616.5" y1="905" x2="1616.5" y2="923" />
+    <line x1="1622" y1="908" x2="1622" y2="920" />
+    <line x1="1627.5" y1="911" x2="1627.5" y2="917" />
+  </g>
+</svg>

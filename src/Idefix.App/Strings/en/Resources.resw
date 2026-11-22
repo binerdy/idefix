@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="NewChat" xml:space="preserve">
+    <value>New chat</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="Chats" xml:space="preserve">
+    <value>Chats</value>
+  </data>
+  <data name="NewProject" xml:space="preserve">
+    <value>New project</value>
+  </data>
+  <data name="SearchChats" xml:space="preserve">
+    <value>Search chats</value>
+  </data>
+  <data name="ToggleSidebar" xml:space="preserve">
+    <value>Toggle sidebar</value>
+  </data>
+  <data name="GreetingFormat" xml:space="preserve">
+    <value>Hello {0}, what shall we look at today?</value>
+  </data>
+  <data name="AskPlaceholder" xml:space="preserve">
+    <value>Ask Idefix</value>
+  </data>
+  <data name="Think" xml:space="preserve">
+    <value>Think</value>
+  </data>
+  <data name="ThinkHint" xml:space="preserve">
+    <value>Deep agentic search (ping-pong) instead of a fast lookup</value>
+  </data>
+  <data name="Dictate" xml:space="preserve">
+    <value>Dictate</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="PluginsForChat" xml:space="preserve">
+    <value>Knowledge plugins for this chat</value>
+  </data>
+  <data name="NoPlugins" xml:space="preserve">
+    <value>No knowledge plugins yet. Create folders in your knowledge folder.</value>
+  </data>
+  <data name="TraceTitleFormat" xml:space="preserve">
+    <value>Searched {0}×</value>
+  </data>
+  <data name="TraceStepFormat" xml:space="preserve">
+    <value>“{0}” → {1} passages</value>
+  </data>
+  <data name="Searching" xml:space="preserve">
+    <value>Searching knowledge…</value>
+  </data>
+  <data name="TemporaryChat" xml:space="preserve">
+    <value>Temporary chat (not saved)</value>
+  </data>
+  <data name="OpenOriginal" xml:space="preserve">
+    <value>Open original file</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="PageFormat" xml:space="preserve">
+    <value>Page {0} of {1}</value>
+  </data>
+  <data name="PreviousPage" xml:space="preserve">
+    <value>Previous page</value>
+  </data>
+  <data name="NextPage" xml:space="preserve">
+    <value>Next page</value>
+  </data>
+  <data name="DocumentMissing" xml:space="preserve">
+    <value>The document could not be found in the knowledge folder.</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="RootFolder" xml:space="preserve">
+    <value>Knowledge folder</value>
+  </data>
+  <data name="RootFolderHint" xml:space="preserve">
+    <value>Every subfolder becomes a knowledge plugin. Your files are never modified.</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse…</value>
+  </data>
+  <data name="LlmSection" xml:space="preserve">
+    <value>Language model</value>
+  </data>
+  <data name="Provider" xml:space="preserve">
+    <value>Provider</value>
+  </data>
+  <data name="ProviderOllama" xml:space="preserve">
+    <value>Ollama (local)</value>
+  </data>
+  <data name="ProviderOpenAI" xml:space="preserve">
+    <value>OpenAI</value>
+  </data>
+  <data name="ProviderCompatible" xml:space="preserve">
+    <value>OpenAI-compatible</value>
+  </data>
+  <data name="Endpoint" xml:space="preserve">
+    <value>Endpoint</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API key</value>
+  </data>
+  <data name="ApiKeyHint" xml:space="preserve">
+    <value>Required for every provider, Ollama included (any value for a plain local install).</value>
+  </data>
+  <data name="ChatModel" xml:space="preserve">
+    <value>Chat model</value>
+  </data>
+  <data name="EmbeddingModel" xml:space="preserve">
+    <value>Embedding model</value>
+  </data>
+  <data name="DiscoverModels" xml:space="preserve">
+    <value>Discover models</value>
+  </data>
+  <data name="ModelsFoundFormat" xml:space="preserve">
+    <value>{0} models found</value>
+  </data>
+  <data name="ModelsFailedFormat" xml:space="preserve">
+    <value>Could not list models: {0}</value>
+  </data>
+  <data name="Behaviour" xml:space="preserve">
+    <value>Behaviour</value>
+  </data>
+  <data name="PrePrompt" xml:space="preserve">
+    <value>Pre-prompt</value>
+  </data>
+  <data name="PrePromptHint" xml:space="preserve">
+    <value>Steers Idefix across all sessions.</value>
+  </data>
+  <data name="ContextMode" xml:space="preserve">
+    <value>Context sent to the model</value>
+  </data>
+  <data name="ContextChunks" xml:space="preserve">
+    <value>Chunks (RAG)</value>
+  </data>
+  <data name="ContextFullFiles" xml:space="preserve">
+    <value>Full files</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>System default</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LanguageSystem" xml:space="preserve">
+    <value>System default</value>
+  </data>
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageGerman" xml:space="preserve">
+    <value>Deutsch (Schweiz)</value>
+  </data>
+  <data name="Updates" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="NightlyOptIn" xml:space="preserve">
+    <value>Receive nightly builds</value>
+  </data>
+  <data name="NightlyHint" xml:space="preserve">
+    <value>Pre-release builds from the develop branch. They may be unstable.</value>
+  </data>
+  <data name="VersionFormat" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="CheckUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="UpdateReady" xml:space="preserve">
+    <value>An update is ready.</value>
+  </data>
+  <data name="RestartNow" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>Idefix is up to date.</value>
+  </data>
+  <data name="UpdatesNotInstalled" xml:space="preserve">
+    <value>Updates are available for installed builds only.</value>
+  </data>
+  <data name="UpdateFailedFormat" xml:space="preserve">
+    <value>Update check failed: {0}</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>Saved.</value>
+  </data>
+  <data name="IndexingFormat" xml:space="preserve">
+    <value>Indexing {0}/{1}…</value>
+  </data>
+  <data name="IndexIdle" xml:space="preserve">
+    <value>Index up to date</value>
+  </data>
+  <data name="IndexFailedFormat" xml:space="preserve">
+    <value>Indexing failed: {0}</value>
+  </data>
+  <data name="IndexFailuresFormat" xml:space="preserve">
+    <value>{0} documents could not be indexed: {1}</value>
+  </data>
+  <data name="Reindex" xml:space="preserve">
+    <value>Re-index now</value>
+  </data>
+  <data name="OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="DocumentsFormat" xml:space="preserve">
+    <value>{0} documents</value>
+  </data>
+  <data name="LibraryHint" xml:space="preserve">
+    <value>Knowledge plugins are the folders inside your knowledge folder. Disabled plugins are never searched.</value>
+  </data>
+  <data name="SetupRequired" xml:space="preserve">
+    <value>Finish your profile to start: choose a provider, API key and models.</value>
+  </data>
+  <data name="OpenProfile" xml:space="preserve">
+    <value>Open profile</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MoveToProject" xml:space="preserve">
+    <value>Move to project</value>
+  </data>
+  <data name="NoProject" xml:space="preserve">
+    <value>No project</value>
+  </data>
+  <data name="NewChatInProject" xml:space="preserve">
+    <value>New chat in project</value>
+  </data>
+  <data name="ProjectPlugins" xml:space="preserve">
+    <value>Plugins for this project…</value>
+  </data>
+  <data name="ProjectPluginsHint" xml:space="preserve">
+    <value>Leave all unchecked to use every enabled plugin.</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Untitled" xml:space="preserve">
+    <value>New chat</value>
+  </data>
+  <data name="DictationUnavailable" xml:space="preserve">
+    <value>Dictation is not available. Check the microphone and speech privacy settings.</value>
+  </data>
+  <data name="AnswerFailedFormat" xml:space="preserve">
+    <value>The model could not answer: {0}</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Sources</value>
+  </data>
+</root>

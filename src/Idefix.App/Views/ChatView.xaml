@@ -1,0 +1,150 @@
+﻿<UserControl x:Class="Idefix.App.Views.ChatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Idefix.App.Controls"
+             xmlns:views="using:Idefix.App.Views"
+             xmlns:vm="using:Idefix.App.ViewModels"
+             xmlns:services="using:Idefix.App.Services">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition x:Name="BottomSpacer" Height="*" />
+    </Grid.RowDefinitions>
+
+    <ScrollViewer x:Name="Scroller" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled" Visibility="{x:Bind views:ViewHelpers.CollapsedWhen(ViewModel.IsEmpty), Mode=OneWay}" Padding="24,0">
+      <controls:CenteredColumn ColumnWidth="{StaticResource StageMaxWidth}">
+      <ItemsControl x:Name="MessageList" ItemsSource="{x:Bind ViewModel.Messages, Mode=OneWay}" Margin="0,8,0,24">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:MessageViewModel">
+            <Grid Margin="0,12">
+              <Border Visibility="{x:Bind IsUser}" HorizontalAlignment="Right" MaxWidth="560"
+                      Background="{ThemeResource UserBubbleBrush}" CornerRadius="18" Padding="16,10">
+                <TextBlock Text="{x:Bind Text}" TextWrapping="Wrap" FontSize="15" IsTextSelectionEnabled="True" />
+              </Border>
+              <StackPanel Visibility="{x:Bind IsAssistant}" Spacing="8">
+                <Expander Visibility="{x:Bind HasTrace, Mode=OneWay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                          IsExpanded="{x:Bind IsStreaming, Mode=OneWay}" Padding="12,4">
+                  <Expander.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <ProgressRing Width="14" Height="14" IsActive="{x:Bind IsStreaming, Mode=OneWay}" />
+                      <FontIcon Glyph="&#xE721;" FontSize="13" Style="{StaticResource IconGlyphStyle}" Foreground="{ThemeResource SecondaryTextBrush}" />
+                      <TextBlock Text="{x:Bind TraceSummary, Mode=OneWay}" FontSize="13" Foreground="{ThemeResource SecondaryTextBrush}" />
+                    </StackPanel>
+                  </Expander.Header>
+                  <ItemsControl ItemsSource="{x:Bind Trace}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:TraceStepViewModel">
+                        <StackPanel Margin="0,4">
+                          <TextBlock Text="{x:Bind Headline}" FontSize="13" />
+                          <TextBlock Text="{x:Bind Sources}" Style="{StaticResource HintTextStyle}" />
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Expander>
+                <controls:CitedText Text="{x:Bind Text, Mode=OneWay}" Citations="{x:Bind Citations, Mode=OneWay}"
+                                    LinkForeground="{ThemeResource CitationBrush}"
+                                    FontSize="15" CitationClicked="OnCitationClicked" />
+              </StackPanel>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      </controls:CenteredColumn>
+    </ScrollViewer>
+
+    <TextBlock Text="{x:Bind ViewModel.Greeting, Mode=OneWay}" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+               TextAlignment="Center" TextWrapping="Wrap" Margin="24,0,24,28"
+               Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}" />
+
+    <InfoBar Grid.Row="2" VerticalAlignment="Top" Margin="24,20,24,0" IsOpen="{x:Bind ViewModel.NeedsSetup, Mode=OneWay}" IsClosable="False"
+             Severity="Informational" MaxWidth="{StaticResource StageMaxWidth}" Message="{x:Bind services:Strings.Get('SetupRequired')}">
+      <InfoBar.ActionButton>
+        <Button Content="{x:Bind services:Strings.Get('OpenProfile')}" Click="OnOpenProfileClicked" />
+      </InfoBar.ActionButton>
+    </InfoBar>
+
+    <Border x:Name="InputBar" Grid.Row="1" Margin="24,0,24,20" MaxWidth="{StaticResource StageMaxWidth}" HorizontalAlignment="Stretch"
+            Background="{ThemeResource PillBackgroundBrush}" BorderBrush="{ThemeResource PillBorderBrush}" BorderThickness="1"
+            CornerRadius="32" Padding="10,8,8,8">
+      <Grid ColumnSpacing="4">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Button Style="{StaticResource GhostButtonStyle}" CornerRadius="20" Width="40" Height="40"
+                ToolTipService.ToolTip="{x:Bind services:Strings.Get('PluginsForChat')}" AutomationProperties.Name="{x:Bind services:Strings.Get('PluginsForChat')}">
+          <FontIcon Glyph="&#xE710;" Style="{StaticResource IconGlyphStyle}" />
+          <Button.Flyout>
+            <Flyout Placement="TopEdgeAlignedLeft">
+              <StackPanel MinWidth="240" Spacing="4">
+                <TextBlock Text="{x:Bind services:Strings.Get('PluginsForChat')}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <TextBlock Text="{x:Bind services:Strings.Get('NoPlugins')}" Style="{StaticResource HintTextStyle}" MaxWidth="260"
+                           Visibility="{x:Bind ViewModel.HasNoPlugins, Mode=OneWay}" />
+                <ItemsControl ItemsSource="{x:Bind ViewModel.SessionPlugins, Mode=OneWay}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PluginToggleViewModel">
+                      <ToggleSwitch Header="{x:Bind Name}" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" OnContent="" OffContent="" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+
+        <TextBox x:Name="PromptBox" AutomationProperties.Name="{x:Bind services:Strings.Get('AskPlaceholder')}" Grid.Column="1" Style="{StaticResource BorderlessTextBoxStyle}"
+                 PlaceholderText="{x:Bind services:Strings.Get('AskPlaceholder')}"
+                 Text="{x:Bind ViewModel.Prompt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextWrapping="Wrap" MaxHeight="180" AcceptsReturn="False" KeyDown="OnPromptKeyDown">
+          <TextBox.Resources>
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent" />
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">0</Thickness>
+          </TextBox.Resources>
+        </TextBox>
+
+        <ToggleButton Grid.Column="2" IsChecked="{x:Bind ViewModel.DeepThinking, Mode=TwoWay}"
+                      AutomationProperties.Name="{x:Bind services:Strings.Get('Think')}" CornerRadius="20" Padding="12,8"
+                      Background="Transparent" BorderThickness="0"
+                      ToolTipService.ToolTip="{x:Bind services:Strings.Get('ThinkHint')}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <FontIcon Glyph="&#xEA80;" FontSize="15" Style="{StaticResource IconGlyphStyle}" />
+            <TextBlock Text="{x:Bind services:Strings.Get('Think')}" FontSize="14" />
+          </StackPanel>
+        </ToggleButton>
+
+        <Button Grid.Column="3" Style="{StaticResource GhostButtonStyle}" CornerRadius="20" Width="40" Height="40"
+                Click="OnDictateClicked" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Dictate')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Dictate')}">
+          <FontIcon Glyph="&#xE720;" Style="{StaticResource IconGlyphStyle}" />
+        </Button>
+
+        <Grid Grid.Column="4">
+          <Button Width="40" Height="40" CornerRadius="20" Padding="0" BorderThickness="0"
+                  Background="{ThemeResource AccentFillBrush}" Foreground="{ThemeResource OnAccentBrush}"
+                  Visibility="{x:Bind views:ViewHelpers.CollapsedWhen(ViewModel.IsBusy), Mode=OneWay}"
+                  Command="{x:Bind ViewModel.SendCommand}" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Send')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Send')}">
+            <FontIcon Glyph="&#xE724;" FontSize="15" Style="{StaticResource IconGlyphStyle}" />
+          </Button>
+          <Button Width="40" Height="40" CornerRadius="20" Padding="0" BorderThickness="0"
+                  Background="{ThemeResource AccentFillBrush}" Foreground="{ThemeResource OnAccentBrush}"
+                  Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay}"
+                  Command="{x:Bind ViewModel.StopCommand}" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Stop')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Stop')}">
+            <FontIcon Glyph="&#xE71A;" FontSize="13" Style="{StaticResource IconGlyphStyle}" />
+          </Button>
+        </Grid>
+      </Grid>
+    </Border>
+
+    <InfoBar x:Name="DictationError" Grid.Row="0" VerticalAlignment="Bottom" Margin="24,0,24,8" MaxWidth="{StaticResource StageMaxWidth}"
+             Severity="Warning" IsOpen="False" Message="{x:Bind services:Strings.Get('DictationUnavailable')}" />
+  </Grid>
+</UserControl>
