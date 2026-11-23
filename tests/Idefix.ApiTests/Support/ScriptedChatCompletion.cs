@@ -16,6 +16,14 @@ internal sealed class ScriptedChatCompletion(string answer, params string[] sele
 
     public int Calls { get; private set; }
 
+    public Queue<(string Function, string Arguments)> ToolCalls { get; } = new();
+
+    public bool AlwaysCallsTools { get; init; }
+
+    public string TextBeforeToolCalls { get; init; } = string.Empty;
+
+    public List<FunctionChoiceBehavior?> ToolChoices { get; } = [];
+
     public int SelectionCalls { get; private set; }
 
     public IReadOnlyDictionary<string, object?> Attributes { get; } = new Dictionary<string, object?>();
@@ -51,6 +59,26 @@ internal sealed class ScriptedChatCompletion(string answer, params string[] sele
     {
         this.LastHistory = chatHistory;
         this.Calls++;
+        var choice = executionSettings?.FunctionChoiceBehavior;
+        this.ToolChoices.Add(choice);
+        if (choice is AutoFunctionChoiceBehavior && this.ToolCalls.TryPeek(out var call))
+        {
+            if (!this.AlwaysCallsTools)
+            {
+                this.ToolCalls.Dequeue();
+            }
+
+            if (this.TextBeforeToolCalls.Length > 0)
+            {
+                yield return new StreamingChatMessageContent(AuthorRole.Assistant, this.TextBeforeToolCalls);
+            }
+
+            var request = new StreamingChatMessageContent(AuthorRole.Assistant, content: null);
+            request.Items.Add(new StreamingFunctionCallUpdateContent($"call{this.Calls}", call.Function, call.Arguments));
+            yield return request;
+            yield break;
+        }
+
         foreach (var word in answer.Split(' '))
         {
             await Task.Yield();

@@ -8,6 +8,7 @@ public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly List<ChatSession> sessions = [];
     private readonly List<Project> projects = [];
+    private readonly List<ChatViewModel> answeringChats = [];
 
     public ShellViewModel(AppServices services)
     {
@@ -93,9 +94,16 @@ public sealed partial class ShellViewModel : ObservableObject
     [RelayCommand]
     public void OpenSession(SessionItemViewModel item)
     {
-        var project = this.projects.Find(p => p.Id == item.Session.ProjectId);
         this.IsTemporaryChat = false;
-        this.Chat = new ChatViewModel(this.Services, item.Session, project, isTemporary: false, this.OnSessionSaved);
+        if (this.FindOpenChat(item.Id) is { } open)
+        {
+            this.Chat = open;
+        }
+        else
+        {
+            this.Chat = this.CreateChat(item.Session, this.ProjectOf(item.Session), isTemporary: false);
+        }
+
         this.Section = ShellSection.Chat;
         this.MarkSelected(item.Id);
     }
@@ -159,12 +167,14 @@ public sealed partial class ShellViewModel : ObservableObject
 
     public async Task UpdateSessionAsync(ChatSession session)
     {
+        this.FindOpenChat(session.Id)?.Update(session, this.ProjectOf(session));
         await this.Services.Sessions.SaveSessionAsync(session, CancellationToken.None);
         this.OnSessionSaved(session);
     }
 
     public async Task DeleteSessionAsync(SessionItemViewModel item)
     {
+        this.FindOpenChat(item.Id)?.Delete();
         await this.Services.Sessions.DeleteSessionAsync(item.Id, CancellationToken.None);
         this.sessions.RemoveAll(s => s.Id == item.Id);
         if (this.Chat.SessionId == item.Id)
@@ -177,6 +187,23 @@ public sealed partial class ShellViewModel : ObservableObject
 
     partial void OnSearchTextChanged(string value) => this.RebuildTree();
 
+    partial void OnChatChanged(ChatViewModel oldValue, ChatViewModel newValue)
+    {
+        this.answeringChats.RemoveAll(c => !c.IsBusy);
+        if (oldValue is { IsBusy: true } && !this.answeringChats.Contains(oldValue))
+        {
+            this.answeringChats.Add(oldValue);
+        }
+    }
+
+    // A chat that is still answering must stay the only writer of its session.
+    private ChatViewModel? FindOpenChat(Guid sessionId) =>
+        this.Chat.SessionId == sessionId
+            ? this.Chat
+            : this.answeringChats.Find(c => c.IsBusy && c.SessionId == sessionId);
+
+    private Project? ProjectOf(ChatSession session) => this.projects.Find(p => p.Id == session.ProjectId);
+
     private void StartChat(Project? project)
     {
         this.IsTemporaryChat = false;
@@ -186,7 +213,10 @@ public sealed partial class ShellViewModel : ObservableObject
     }
 
     private ChatViewModel CreateChat(Project? project, bool isTemporary) =>
-        new(this.Services, ChatSession.Start(project?.Id, this.Services.Time), project, isTemporary, this.OnSessionSaved);
+        this.CreateChat(ChatSession.Start(project?.Id, this.Services.Time), project, isTemporary);
+
+    private ChatViewModel CreateChat(ChatSession session, Project? project, bool isTemporary) =>
+        new(this.Services, session, project, isTemporary, this.OnSessionSaved);
 
     private void OnSessionSaved(ChatSession session)
     {
