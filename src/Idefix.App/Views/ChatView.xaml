@@ -137,13 +137,13 @@
           <Button Width="40" Height="40" CornerRadius="20" Padding="0" BorderThickness="0"
                   Background="{ThemeResource AccentFillBrush}" Foreground="{ThemeResource OnAccentBrush}"
                   Visibility="{x:Bind views:ViewHelpers.CollapsedWhen(ViewModel.IsBusy), Mode=OneWay}"
-                  Command="{x:Bind ViewModel.SendCommand}" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Send')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Send')}">
+                  Command="{x:Bind ViewModel.SendCommand, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Send')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Send')}">
             <FontIcon Glyph="&#xE724;" FontSize="15" Style="{StaticResource IconGlyphStyle}" />
           </Button>
           <Button Width="40" Height="40" CornerRadius="20" Padding="0" BorderThickness="0"
                   Background="{ThemeResource AccentFillBrush}" Foreground="{ThemeResource OnAccentBrush}"
                   Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay}"
-                  Command="{x:Bind ViewModel.StopCommand}" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Stop')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Stop')}">
+                  Command="{x:Bind ViewModel.StopCommand, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind services:Strings.Get('Stop')}" AutomationProperties.Name="{x:Bind services:Strings.Get('Stop')}">
             <FontIcon Glyph="&#xE71A;" FontSize="13" Style="{StaticResource IconGlyphStyle}" />
           </Button>
         </Grid>

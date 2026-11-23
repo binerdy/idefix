@@ -38,6 +38,21 @@ The system SHALL estimate the token size of the active documents and SHALL NOT c
 - **WHEN** the active documents need about 700k tokens and the context window is 524k
 - **THEN** no request is sent and the message explains the sizes and how to switch plugins off
 
+### Requirement: Leaving a running chat
+A question SHALL be saved and listed in the sidebar as soon as it is sent. Leaving the chat SHALL NOT stop the answer, and returning SHALL show the question with the answer so far. Renaming or moving the chat meanwhile SHALL be kept; deleting it SHALL stop the answer.
+
+#### Scenario: Visit the library while an answer is running
+- **WHEN** the user asks a question, opens the library and returns to the chat before the answer is complete
+- **THEN** the question is still there and the answer continues
+
+#### Scenario: Two chats
+- **WHEN** one chat is answering and the user opens another
+- **THEN** Send and Stop act on the chat that is shown
+
+#### Scenario: Delete while an answer is running
+- **WHEN** the user deletes the chat before the answer is complete
+- **THEN** it does not reappear
+
 ### Requirement: Visible context
 While sections are being chosen the conversation SHALL show it live, and each answer SHALL show which sections were sent, out of how many, and their estimated token count.
 

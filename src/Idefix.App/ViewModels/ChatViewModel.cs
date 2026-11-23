@@ -10,9 +10,10 @@ namespace Idefix.App.ViewModels;
 public sealed partial class ChatViewModel : ObservableObject, IDisposable
 {
     private readonly AppServices services;
-    private readonly Project? project;
     private readonly Action<ChatSession> saved;
+    private Project? project;
     private ChatSession session;
+    private bool isDeleted;
     private CancellationTokenSource? answering;
 
     public ChatViewModel(AppServices services, ChatSession session, Project? project, bool isTemporary, Action<ChatSession> saved)
@@ -76,6 +77,19 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
         this.OnPropertyChanged(nameof(this.Greeting));
     }
 
+    public void Update(ChatSession changed, Project? newProject)
+    {
+        this.session = this.session with { Title = changed.Title, ProjectId = changed.ProjectId };
+        this.project = newProject;
+        this.RefreshPlugins();
+    }
+
+    public void Delete()
+    {
+        this.isDeleted = true;
+        this.Stop();
+    }
+
     [RelayCommand]
     public void Stop() => this.answering?.Cancel();
 
@@ -115,6 +129,8 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
 
         try
         {
+            // Saved before the answer, so the question survives leaving the chat or closing the app.
+            await this.SaveAsync();
             var request = new AnswerRequest(question, history, plugins, this.DeepThinking);
             await foreach (var answerEvent in runtime.AnswerEngine.AskAsync(request, this.answering.Token))
             {
@@ -172,7 +188,7 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
 
     private async Task SaveAsync()
     {
-        if (this.IsTemporary || this.session.Messages.Count == 0)
+        if (this.IsTemporary || this.isDeleted || this.session.Messages.Count == 0)
         {
             return;
         }
