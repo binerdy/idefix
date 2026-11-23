@@ -7,6 +7,12 @@
       "matchManagers": ["nuget"],
       "matchPackageNames": ["Uno.Sdk"],
       "groupName": "Uno Platform"
+    },
+    {
+      "description": "4.9.0 is an unlisted third-party upload that is incompatible with Lucene.Net",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Lucene.Net.Analysis.Common"],
+      "allowedVersions": "!/^4\\.9\\.0$/"
     }
   ]
 }

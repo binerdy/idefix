@@ -15,8 +15,8 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 
 ## Features
 
-- **Sections, no embeddings**: for each question the model first sees a table of contents of all active sections and picks the ones it needs; only those are sent.
-- **Ping-pong** ("Nachdenken"): after reading its first picks, the model may ask for more sections, for up to three rounds. Each round shows up live in the conversation.
+- **Local search, no embeddings**: for each question a local keyword search (Lucene.NET, German stemming) finds the best sections; only those are sent, without an extra model call.
+- **Ping-pong** ("Nachdenken"): the model answers right away if the sections are enough; otherwise it may search again or open the table of contents, for up to two more rounds. Each round shows up live in the conversation.
 - **Markdown stays in sync**: sections follow added, changed and deleted documents automatically; "Markdown neu erstellen" in the Library regenerates them on demand.
 - **Citations** like `[Mietrecht.pdf, p. 4]` open an in-app viewer with the cited lines highlighted, plus "Open original file".
 - **Projects and sessions** in the sidebar; plugins can be scoped per project and toggled per chat with `+`.
@@ -46,7 +46,7 @@ $env:IDEFIX_DATA_DIR = "$env:TEMP\idefix-dev"; dotnet run --project src/Idefix.A
 | Path | Purpose |
 | --- | --- |
 | `src/Idefix.Core` | Domain records, interfaces and pure logic (document context, citation lines, plugin scopes, sky math, mascot) |
-| `src/Idefix.Infrastructure` | PdfPig/OpenXml parsing, cached document library, Semantic Kernel answer engine, DPAPI settings, Velopack |
+| `src/Idefix.Infrastructure` | PdfPig/OpenXml parsing, cached document library, Lucene.NET section search, Semantic Kernel answer engine, DPAPI settings, Velopack |
 | `src/Idefix.App` | Uno Platform app (Windows App SDK head) |
 | `tests/Idefix.ApiTests` | API-level tests with real files and a real index |
 | `openspec/` | Project conventions and capability specs |

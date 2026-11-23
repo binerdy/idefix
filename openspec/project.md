@@ -12,7 +12,7 @@ prompts sent to the language model provider the user configured.
 - Microsoft Semantic Kernel (orchestration, tool calling) with the OpenAI connector against
   OpenAI or any OpenAI-compatible endpoint (Ollama exposes one at `/v1`)
 - UglyToad.PdfPig (PDF) and DocumentFormat.OpenXml (DOCX) with line coordinates
-- No index and no embeddings: the full text of the active documents is sent with each question
+- Lucene.NET for an in-memory keyword index over the Markdown sections; no embeddings, nothing written to disk
 - SkiaSharp for the celestial background, Inter as the only typeface
 - Velopack for installers and auto-update from GitHub Releases
 - xUnit v3 on Microsoft.Testing.Platform
@@ -23,7 +23,9 @@ The codebase follows the CUPID properties rather than layered ceremony:
 - **Composable** – small types with one purpose and few dependencies. `IdefixRuntime` wires
   them together; nothing else knows how the graph is built.
 - **Unix philosophy** – each type does one thing: `DocumentLibrary` reads and caches,
-  `DocumentContext` formats, `CitationLocator` finds cited lines, the engine streams.
+  `LuceneSectionSearch` finds sections, `SectionCollector` keeps them within the budget,
+  `SectionTools` lets the model ask for more, `AnswerConversation` streams,
+  `DocumentContext` formats, `CitationLocator` finds cited lines.
 - **Predictable** – pure functions in `Idefix.Core` (context building, citation lines, scoping, sky math)
   are deterministic and covered by tests. Side effects live in `Idefix.Infrastructure`.
 - **Idiomatic** – modern C# (records, primary constructors, collection expressions), MVVM with
@@ -70,6 +72,8 @@ Projects:
   optionally narrowed per project, and toggled per chat session.
 - **Document library** – the parsed text of all documents, cached in memory and re-read when a
   file's size or modification time changes.
+- **Section** – a Markdown part of a document with title and pages; the unit of search and context.
+- **Round** – one step of collecting sections: the local search first, then the model's own requests.
 - **Context window** – the model's token budget; the active documents must fit into it.
 - **Citation** – `[File.pdf, p. 4]`, resolved to plugin, page and line range for highlighting.
 
