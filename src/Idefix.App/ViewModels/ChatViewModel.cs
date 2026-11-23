@@ -148,6 +148,9 @@ public sealed partial class ChatViewModel : ObservableObject, IDisposable
                     case TextDelta delta:
                         reply.AppendText(delta.Text);
                         break;
+                    case TextDiscarded:
+                        reply.DiscardText();
+                        break;
                     case AnswerCompleted completed:
                         reply.Complete(completed.Message);
                         this.session = this.session.Append(completed.Message);

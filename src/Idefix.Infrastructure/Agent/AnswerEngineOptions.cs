@@ -5,4 +5,5 @@ public sealed record AnswerEngineOptions(
     int MaxContextTokens,
     int HistoryMessages = 10,
     int SelectionThresholdTokens = 8_000,
-    int MaxRounds = 3);
+    int MaxRounds = 3,
+    int SearchLimit = 8);

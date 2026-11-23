@@ -8,12 +8,14 @@ using Idefix.Infrastructure.Knowledge;
 using Idefix.Infrastructure.Llm;
 using Idefix.Infrastructure.Markdown;
 using Idefix.Infrastructure.Parsing;
+using Idefix.Infrastructure.Search;
 
 namespace Idefix.Infrastructure;
 
 public sealed class IdefixRuntime : IDisposable
 {
     private readonly KnowledgeWatcher watcher;
+    private readonly LuceneSectionSearch search;
 
     private IdefixRuntime(
         IdefixSettings settings,
@@ -21,6 +23,7 @@ public sealed class IdefixRuntime : IDisposable
         IDocumentParser parser,
         IDocumentLibrary library,
         ISectionStore sections,
+        LuceneSectionSearch search,
         IAnswerEngine answerEngine,
         KnowledgeWatcher watcher)
     {
@@ -30,6 +33,7 @@ public sealed class IdefixRuntime : IDisposable
         this.Library = library;
         this.Sections = sections;
         this.AnswerEngine = answerEngine;
+        this.search = search;
         this.watcher = watcher;
         this.watcher.Changed += (_, _) => this.KnowledgeChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -55,14 +59,16 @@ public sealed class IdefixRuntime : IDisposable
         var parser = CompositeDocumentParser.CreateDefault();
         var library = new DocumentLibrary(settings.RootDirectory, catalog, parser);
         var sections = new MarkdownSectionStore();
+        var search = new LuceneSectionSearch();
         var engine = new SemanticKernelAnswerEngine(
             LlmClients.CreateKernel(settings.Llm, httpClient),
             library,
             sections,
+            search,
             new AnswerEngineOptions(settings.PrePrompt, settings.Llm.MaxContextTokens),
             timeProvider);
         var watcher = new KnowledgeWatcher(settings.RootDirectory, TimeSpan.FromSeconds(2), timeProvider);
-        return new IdefixRuntime(settings, catalog, parser, library, sections, engine, watcher);
+        return new IdefixRuntime(settings, catalog, parser, library, sections, search, engine, watcher);
     }
 
     public IReadOnlyList<KnowledgePlugin> Plugins() => this.Catalog.DiscoverPlugins(this.Settings.RootDirectory);
@@ -73,6 +79,7 @@ public sealed class IdefixRuntime : IDisposable
     public void Dispose()
     {
         this.watcher.Dispose();
+        this.search.Dispose();
         (this.Sections as IDisposable)?.Dispose();
     }
 }

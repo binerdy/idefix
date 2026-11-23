@@ -1,9 +1,12 @@
 ﻿using Idefix.ApiTests.Support;
 using Idefix.Core.Agent;
+using Idefix.Core.Settings;
 using Idefix.Infrastructure.Agent;
 using Idefix.Infrastructure.Knowledge;
+using Idefix.Infrastructure.Llm;
 using Idefix.Infrastructure.Markdown;
 using Idefix.Infrastructure.Parsing;
+using Idefix.Infrastructure.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -14,6 +17,7 @@ public sealed class AnswerEngineTests : IDisposable
 {
     private readonly TempDirectory root = new();
     private readonly MarkdownSectionStore store = new();
+    private readonly LuceneSectionSearch search = new();
     private readonly CancellationToken cancellation = TestContext.Current.CancellationToken;
 
     public AnswerEngineTests()
@@ -107,52 +111,118 @@ public sealed class AnswerEngineTests : IDisposable
     }
 
     [Fact]
-    public async Task LargerLibrariesSendOnlyTheSectionsTheModelPicks()
+    public async Task LargerLibrariesSendOnlyTheSectionsFoundByTheLocalSearch()
     {
-        var chat = new ScriptedChatCompletion("Drei Monate [Mietrecht.pdf, p. 2].", "{\"sections\": [\"S2\"]}");
+        var chat = new ScriptedChatCompletion("Drei Monate [Mietrecht.pdf, p. 2].");
 
         var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
 
-        Assert.Equal(2, chat.SelectionCalls);
-        Assert.Contains("S1 | Zopf.docx", chat.SelectionPrompt, StringComparison.Ordinal);
-        Assert.Contains("Question: Kuendigungsfrist?", chat.SelectionPrompt, StringComparison.Ordinal);
-        var selecting = events.OfType<SelectingSections>().First();
+        Assert.Equal((0, 1), (chat.SelectionCalls, chat.Calls));
         var summary = Assert.Single(events.OfType<ContextPrepared>()).Summary;
-        Assert.True(summary.TotalSections >= 2);
-        Assert.Equal(selecting.TotalSections, summary.TotalSections);
-        Assert.Single(summary.Documents);
+        Assert.True(summary.TotalSections > summary.Documents.Count);
+        Assert.Single(summary.Rounds!);
         var prompt = chat.LastHistory![^1].Content!;
         Assert.DoesNotContain("Zopf", prompt, StringComparison.Ordinal);
-        Assert.Contains("[Mietrecht.pdf, p.", prompt, StringComparison.Ordinal);
+        Assert.Contains("[Mietrecht.pdf, p. 2]", prompt, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task PingPongAddsSectionsOverSeveralRoundsAndShowsThemLive()
+    public async Task WhenTheLocalSearchFindsNothingTheModelPicksFromTheTableOfContents()
     {
-        TestDocuments.WriteDocx(this.root.Combine("Recht", "Vertrag.docx"), "# Kuendigung\nDrei Monate\n# Kaution\nZwei Mieten");
-        var chat = new ScriptedChatCompletion("ok", "{\"sections\": [\"S2\"]}", "{\"sections\": [\"S3\"]}", "{\"sections\": []}");
+        var chat = new ScriptedChatCompletion("ok", "{\"sections\": [\"S1\"]}");
 
-        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Frage", [], ["Recht", "Kochen"]), this.cancellation));
+        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Bread recipe?", [], ["Recht", "Kochen"]), this.cancellation));
 
-        Assert.Equal(3, chat.SelectionCalls);
-        Assert.Contains("Sections you already have", chat.SelectionPrompts[1], StringComparison.Ordinal);
-        Assert.Contains("Mietrecht.pdf", chat.SelectionPrompts[1], StringComparison.Ordinal);
+        Assert.Equal((1, 1), (chat.SelectionCalls, chat.Calls));
+        Assert.Contains("S1 | Zopf.docx", chat.SelectionPrompt, StringComparison.Ordinal);
+        Assert.Contains("Question: Bread recipe?", chat.SelectionPrompt, StringComparison.Ordinal);
+        Assert.StartsWith("Zopf.docx", Assert.Single(Assert.Single(events.OfType<ContextPrepared>()).Summary.Documents), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task PingPongLetsTheModelSearchAgainAndShowsItLive()
+    {
+        var chat = new ScriptedChatCompletion("Butter.") { TextBeforeToolCalls = "Moment." };
+        chat.ToolCalls.Enqueue(("search_sections", "{\"query\": \"Zopf\"}"));
+
+        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
+
+        Assert.Equal((0, 2), (chat.SelectionCalls, chat.Calls));
+        Assert.Contains("Zopf braucht Butter und Mehl", ToolResult(chat), StringComparison.Ordinal);
         Assert.Equal([1, 2], events.OfType<SectionsPicked>().Select(p => p.Round.Number));
-        Assert.Equal([1, 2, 3], events.OfType<SelectingSections>().Select(s => s.Round));
-        var summary = Assert.Single(events.OfType<ContextPrepared>()).Summary;
-        Assert.Equal(2, summary.Documents.Count);
-        Assert.Equal(2, summary.Rounds!.Count);
+        Assert.Equal([1, 2], events.OfType<SelectingSections>().Select(p => p.Round));
+        Assert.Single(events.OfType<TextDiscarded>());
+        var message = Assert.IsType<AnswerCompleted>(events[^1]).Message;
+        Assert.Equal("Butter. ", message.Content);
+        Assert.Equal(2, message.Context!.Documents.Count);
+        Assert.Equal(2, message.Context.Rounds!.Count);
     }
 
     [Fact]
-    public async Task WithoutNachdenkenThereIsOnlyOneRound()
+    public async Task TheModelCanOpenTheTableOfContentsAndReadASection()
     {
-        var chat = new ScriptedChatCompletion("ok", "{\"sections\": [\"S2\"]}", "{\"sections\": [\"S3\"]}");
+        var chat = new ScriptedChatCompletion("ok");
+        chat.ToolCalls.Enqueue(("list_sections", "{}"));
+        chat.ToolCalls.Enqueue(("read_sections", "{\"ids\": \"S1\"}"));
 
-        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Frage", [], ["Recht", "Kochen"], DeepThinking: false), this.cancellation));
+        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
 
-        Assert.Equal(1, chat.SelectionCalls);
-        Assert.Single(Assert.Single(events.OfType<ContextPrepared>()).Summary.Documents);
+        Assert.Equal(3, chat.Calls);
+        Assert.Contains("Zopf braucht Butter und Mehl", ToolResult(chat), StringComparison.Ordinal);
+        Assert.Equal([1, 3], events.OfType<SectionsPicked>().Select(p => p.Round.Number));
+    }
+
+    [Fact]
+    public async Task TheLastRoundMustAnswer()
+    {
+        var chat = new ScriptedChatCompletion("ok") { AlwaysCallsTools = true };
+        chat.ToolCalls.Enqueue(("list_sections", "{}"));
+
+        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
+
+        Assert.Equal(3, chat.Calls);
+        Assert.IsType<NoneFunctionChoiceBehavior>(chat.ToolChoices[^1]);
+        Assert.Equal("ok ", Assert.IsType<AnswerCompleted>(events[^1]).Message.Content);
+    }
+
+    [Theory]
+    [InlineData("no_such_function", "{}")]
+    [InlineData("search_sections", "{}")]
+    [InlineData("search_sections", "not json")]
+    public async Task ABrokenToolCallIsReportedToTheModel(string function, string arguments)
+    {
+        var chat = new ScriptedChatCompletion("ok");
+        chat.ToolCalls.Enqueue((function, arguments));
+
+        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
+
+        Assert.NotEmpty(ToolResult(chat));
+        Assert.IsType<AnswerCompleted>(events[^1]);
+    }
+
+    [Fact]
+    public async Task ModelsWithoutToolSupportAnswerFromTheLocalSearch()
+    {
+        using var server = new NoToolsServer("Drei Monate.");
+        using var http = new HttpClient(server);
+        var kernel = LlmClients.CreateKernel(new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost/v1/"), string.Empty, "small"), http);
+
+        var events = await Collect(this.CreateEngine(kernel, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
+
+        Assert.Equal((1, 1), (server.Rejected, server.Answered));
+        Assert.Equal("Drei Monate.", Assert.IsType<AnswerCompleted>(events[^1]).Message.Content);
+    }
+
+    [Fact]
+    public async Task WithoutNachdenkenTheModelIsCalledOnce()
+    {
+        var chat = new ScriptedChatCompletion("ok");
+        chat.ToolCalls.Enqueue(("list_sections", "{}"));
+
+        await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"], DeepThinking: false), this.cancellation));
+
+        Assert.Equal((0, 1), (chat.SelectionCalls, chat.Calls));
+        Assert.Null(Assert.Single(chat.ToolChoices));
     }
 
     [Fact]
@@ -177,6 +247,7 @@ public sealed class AnswerEngineTests : IDisposable
 
     public void Dispose()
     {
+        this.search.Dispose();
         this.store.Dispose();
         this.root.Dispose();
     }
@@ -192,15 +263,21 @@ public sealed class AnswerEngineTests : IDisposable
         return list;
     }
 
+    private static string ToolResult(ScriptedChatCompletion chat) =>
+        chat.LastHistory!.Last(m => m.Role == AuthorRole.Tool).Items.OfType<FunctionResultContent>().Single().Result?.ToString() ?? string.Empty;
+
     private SemanticKernelAnswerEngine CreateEngine(ScriptedChatCompletion chat, int maxContextTokens = 100_000, int selectionThreshold = 8_000)
     {
         var builder = Kernel.CreateBuilder();
         builder.Services.AddSingleton<IChatCompletionService>(chat);
-        return new SemanticKernelAnswerEngine(
-            builder.Build(),
-            new DocumentLibrary(this.root.Path, new FileSystemKnowledgeCatalog(), CompositeDocumentParser.CreateDefault()),
-            this.store,
-            new AnswerEngineOptions("Antworte knapp.", maxContextTokens, SelectionThresholdTokens: selectionThreshold),
-            TimeProvider.System);
+        return this.CreateEngine(builder.Build(), maxContextTokens, selectionThreshold);
     }
+
+    private SemanticKernelAnswerEngine CreateEngine(Kernel kernel, int maxContextTokens = 100_000, int selectionThreshold = 8_000) => new(
+        kernel,
+        new DocumentLibrary(this.root.Path, new FileSystemKnowledgeCatalog(), CompositeDocumentParser.CreateDefault()),
+        this.store,
+        this.search,
+        new AnswerEngineOptions("Antworte knapp.", maxContextTokens, SelectionThresholdTokens: selectionThreshold),
+        TimeProvider.System);
 }

@@ -1,35 +1,51 @@
 # answering Specification
 
 ## Purpose
-Answer questions from the relevant Markdown sections of the user's active documents, chosen by the model from a table of contents, with verifiable citations.
+Answer questions from the relevant Markdown sections of the user's active documents, found by a local search and extended by the model when needed, with verifiable citations.
 
 ## Requirements
 
-### Requirement: Section selection from a table of contents
-When the active sections together exceed a small threshold (8k tokens), the system SHALL first send the model a table of contents (id, file, pages, title, size, beginning of the text) and ask for the ids of the sections it needs, then send only those sections. Small libraries are sent completely without this step. No embeddings are used. A reply that cannot be read falls back to all sections that fit.
+### Requirement: Local section search
+When the active sections together exceed a small threshold (8k tokens), the system SHALL search them locally and send the best matches (at most eight) with the question. The search ranks by BM25 over stemmed words (70 %) and groups of three letters (30 %), counts titles twice, folds umlauts and ignores stop words. No model call and no embeddings are used. The index is kept in memory and rebuilt when the sections change. Small libraries are sent completely without this step.
 
-#### Scenario: Only chosen sections are sent
-- **WHEN** the model picks `S2` out of 42 sections
-- **THEN** the answer request contains only section `S2`, with its page markers `--- [FileName.pdf, p. N] ---`
+#### Scenario: Only matching sections are sent
+- **WHEN** the question mentions "Kündigungsfrist" and one of 42 sections contains it
+- **THEN** the first answer request contains that section, with its page markers `--- [FileName.pdf, p. N] ---`, and no selection request was made
+
+#### Scenario: Word forms and spellings
+- **WHEN** the user asks for "Kuendigung" or "Abstellplatz"
+- **THEN** sections about "Kündigung" or "Abstellplätze" are found
+
+#### Scenario: Nothing in common
+- **WHEN** no section shares a single word with the question, for example because the documents use another language
+- **THEN** the model picks sections from the table of contents (id, file, pages, title, size, beginning of the text); a reply that cannot be read falls back to all sections that fit
 
 #### Scenario: Small library
 - **WHEN** all active sections together are smaller than the threshold
-- **THEN** they are all sent and no selection request is made
+- **THEN** they are all sent and neither a search nor a selection request is made
 
 #### Scenario: Disabled plugins stay private
 - **WHEN** `Kochen` is switched off for the chat
-- **THEN** none of its text is sent
+- **THEN** none of its text is searched or sent
 
 ### Requirement: Ping-pong (Nachdenken)
-With "Nachdenken" on (the default), the system SHALL allow up to three selection rounds. From round two on, the model sees the sections it already has plus the table of contents and either requests more section ids or replies that it has enough. With "Nachdenken" off there is exactly one selection round. Every round SHALL appear live in the conversation and be stored with the answer.
+With "Nachdenken" on (the default), the model MAY answer right away or use tools to search again, open the table of contents and read sections from it, for up to two further rounds. The round after that SHALL answer. Text written before a tool call is not part of the answer. With "Nachdenken" off the model is called exactly once after the local search. Every round that adds sections SHALL appear live in the conversation and be stored with the answer.
+
+#### Scenario: The first search is enough
+- **WHEN** the sections from the local search answer the question
+- **THEN** the model answers in its first call
 
 #### Scenario: Model asks for more
-- **WHEN** the model picks `S2` in round 1 and, after reading it, asks for `S7`
-- **THEN** the conversation shows "Runde 1: …" and "Runde 2: …", and the answer uses both sections
+- **WHEN** the model searches for "Bruttogeschossfläche" after reading the first sections
+- **THEN** the conversation shows "Runde 1: …" and "Runde 2: …", and the answer uses both
+
+#### Scenario: Model without tool support
+- **WHEN** the server rejects a request that offers tools
+- **THEN** the question is answered from the local search without tools
 
 #### Scenario: Nachdenken off
 - **WHEN** Nachdenken is switched off
-- **THEN** only one selection request is made before answering
+- **THEN** no tools are offered
 
 ### Requirement: Context window budget
 The system SHALL estimate the token size of the active documents and SHALL NOT call the model when it exceeds the context window configured in the profile. The user SHALL see the estimated size and the limit.

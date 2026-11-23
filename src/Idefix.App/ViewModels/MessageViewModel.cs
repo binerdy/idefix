@@ -87,6 +87,12 @@ public sealed partial class MessageViewModel : ObservableObject
         this.Text = this.streamed.ToString();
     }
 
+    public void DiscardText()
+    {
+        this.streamed.Clear();
+        this.Text = string.Empty;
+    }
+
     public void ShowContext(ContextSummary? summary)
     {
         this.Documents.Clear();
