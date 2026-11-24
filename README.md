@@ -10,7 +10,7 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 
 - Every subfolder of your knowledge folder (default `%USERPROFILE%\IdefixKnowledge`) is a **knowledge plugin**. Add, edit or delete files and Idefix re-indexes in the background.
 - Your files are opened read-only and never modified. Idefix splits them into Markdown sections in a visible `_markdown` folder inside each plugin, which you can read and edit.
-- Profile and API keys are encrypted with Windows DPAPI; chats are plain JSON in `%LOCALAPPDATA%\Idefix`.
+- Profile and API keys are encrypted with Windows DPAPI; chats are plain JSON in `%LOCALAPPDATA%\Idefix.Data`, separate from the program folder, so uninstalling never deletes them.
 - Works with any OpenAI-compatible chat model, including a local [Ollama](https://ollama.com) or the FHNW Planet Express service. No embedding model is needed.
 
 ## Features

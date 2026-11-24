@@ -9,24 +9,33 @@ public sealed class VelopackUpdateService(Uri repository) : IUpdateService
     private UpdateManager? manager;
     private UpdateInfo? pending;
 
-    public async Task<UpdateStatus> PrepareAsync(bool includeNightly, CancellationToken cancellationToken)
+    public async Task<UpdateCheck> PrepareAsync(bool includeNightly, CancellationToken cancellationToken)
     {
         var source = new GithubSource(repository.ToString(), accessToken: null, prerelease: includeNightly);
-        this.manager = new UpdateManager(source);
-        if (!this.manager.IsInstalled)
+        var current = new UpdateManager(source);
+        if (!current.IsInstalled)
         {
-            return UpdateStatus.NotInstalled;
+            return new UpdateCheck(UpdateStatus.NotInstalled);
         }
 
-        var update = await this.manager.CheckForUpdatesAsync();
+        var update = await current.CheckForUpdatesAsync();
         if (update is null)
         {
-            return UpdateStatus.UpToDate;
+            return this.pending is null ? new UpdateCheck(UpdateStatus.UpToDate) : Ready(this.pending);
         }
 
-        await this.manager.DownloadUpdatesAsync(update, progress: null, cancelToken: cancellationToken);
+        if (this.pending?.TargetFullRelease.Version == update.TargetFullRelease.Version)
+        {
+            return Ready(this.pending);
+        }
+
+        await current.DownloadUpdatesAsync(update, progress: null, cancelToken: cancellationToken);
+        this.manager = current;
         this.pending = update;
-        return UpdateStatus.ReadyToApply;
+
+        // Update.exe waits in the background and installs the download as soon as Idefix exits.
+        current.WaitExitThenApplyUpdates(update.TargetFullRelease, silent: true, restart: false);
+        return Ready(update);
     }
 
     public void ApplyAndRestart()
@@ -36,4 +45,7 @@ public sealed class VelopackUpdateService(Uri repository) : IUpdateService
             this.manager.ApplyUpdatesAndRestart(this.pending.TargetFullRelease);
         }
     }
+
+    private static UpdateCheck Ready(UpdateInfo update) =>
+        new(UpdateStatus.ReadyToApply, update.TargetFullRelease.Version.ToString());
 }

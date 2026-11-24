@@ -46,7 +46,7 @@ public sealed partial class IdefixApplication : Application
         splash.Report(0.9, "SplashCheckingUpdates");
         try
         {
-            await this.services.CheckForUpdatesAsync().WaitAsync(TimeSpan.FromSeconds(2.5));
+            await this.services.StartUpdateChecksAsync().WaitAsync(TimeSpan.FromSeconds(2.5));
         }
         catch (TimeoutException)
         {

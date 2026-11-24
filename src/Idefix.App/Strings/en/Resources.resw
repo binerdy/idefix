@@ -180,9 +180,6 @@
   <data name="CheckUpdates" xml:space="preserve">
     <value>Check for updates</value>
   </data>
-  <data name="UpdateReady" xml:space="preserve">
-    <value>An update is ready.</value>
-  </data>
   <data name="RestartNow" xml:space="preserve">
     <value>Restart now</value>
   </data>
@@ -332,5 +329,11 @@
   </data>
   <data name="RebuildMarkdownPluginHintFormat" xml:space="preserve">
     <value>Deletes and regenerates the Markdown sections of “{0}”. Manual edits in its _markdown folder are lost.</value>
+  </data>
+  <data name="UpdateReadyFormat" xml:space="preserve">
+    <value>Idefix {0} is ready and will be installed when you close Idefix.</value>
+  </data>
+  <data name="UpdateCheckedFormat" xml:space="preserve">
+    <value>Checked at {0}: {1}</value>
   </data>
 </root>

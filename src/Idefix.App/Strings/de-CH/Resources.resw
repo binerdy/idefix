@@ -180,9 +180,6 @@
   <data name="CheckUpdates" xml:space="preserve">
     <value>Nach Updates suchen</value>
   </data>
-  <data name="UpdateReady" xml:space="preserve">
-    <value>Ein Update ist bereit.</value>
-  </data>
   <data name="RestartNow" xml:space="preserve">
     <value>Jetzt neu starten</value>
   </data>
@@ -332,5 +329,11 @@
   </data>
   <data name="RebuildMarkdownPluginHintFormat" xml:space="preserve">
     <value>Löscht die Markdown-Abschnitte von «{0}» und erstellt sie neu. Manuelle Änderungen im _markdown-Ordner gehen verloren.</value>
+  </data>
+  <data name="UpdateReadyFormat" xml:space="preserve">
+    <value>Idefix {0} ist bereit und wird beim Schliessen installiert.</value>
+  </data>
+  <data name="UpdateCheckedFormat" xml:space="preserve">
+    <value>Geprüft um {0}: {1}</value>
   </data>
 </root>

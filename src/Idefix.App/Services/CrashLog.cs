@@ -4,11 +4,13 @@ namespace Idefix.App.Services;
 
 public static class CrashLog
 {
-    public static void Write(Exception exception)
+    public static void Write(Exception exception) => Append("crash.log", exception.ToString());
+
+    public static void Append(string fileName, string message)
     {
         var directory = Path.Combine(AppServices.DataDirectory, "logs");
         Directory.CreateDirectory(directory);
-        var entry = string.Create(CultureInfo.InvariantCulture, $"[{DateTimeOffset.Now:O}] {exception}{Environment.NewLine}{Environment.NewLine}");
-        File.AppendAllText(Path.Combine(directory, "crash.log"), entry);
+        var entry = string.Create(CultureInfo.InvariantCulture, $"[{DateTimeOffset.Now:O}] {message}{Environment.NewLine}");
+        File.AppendAllText(Path.Combine(directory, fileName), entry);
     }
 }

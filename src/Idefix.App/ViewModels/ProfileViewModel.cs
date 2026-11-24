@@ -96,6 +96,7 @@ public sealed partial class ProfileViewModel : ObservableObject
         this.ThemeIndex = (int)settings.Theme;
         this.LanguageIndex = (int)settings.Language;
         this.NightlyUpdates = settings.NightlyUpdates;
+        this.UpdateStatus = this.services.UpdateStatusText;
         this.Status = string.Empty;
         this.OnPropertyChanged(nameof(this.NeedsSetup));
     }

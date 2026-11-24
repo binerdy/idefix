@@ -45,8 +45,12 @@ Every push to `main` SHALL read `<Version>` and, when the tag `v<Version>` does 
 - **THEN** the release `v0.2.0` is published from the merge commit
 
 ### Requirement: Auto-update
-The installed app SHALL check GitHub Releases through Velopack at startup, download a newer release in the background and offer "Restart now" to apply it.
+The installed app SHALL check GitHub Releases through Velopack at startup and every four hours, download a newer release in the background, and install it automatically when the app exits. A banner SHALL name the downloaded version and offer "Restart now" to apply it immediately. The time and result of the last check, including errors, SHALL be shown in Settings, and errors SHALL be written to `logs/update.log`.
 
 #### Scenario: Update ready
 - **WHEN** a newer stable release exists
-- **THEN** the sidebar shows that an update is ready with a restart action
+- **THEN** a banner shows "Idefix 0.3.0 ist bereit und wird beim Schliessen installiert." with a restart action
+
+#### Scenario: Update applied on exit
+- **WHEN** an update was downloaded and the user closes Idefix
+- **THEN** the next start runs the new version without any further action

@@ -6,7 +6,11 @@ Keep personal configuration local and protected, separated into who the user is 
 ## Requirements
 
 ### Requirement: Protected local storage
-Profile and settings SHALL be stored locally and encrypted with Windows DPAPI for the current user. `IDEFIX_DATA_DIR` MAY override the storage folder for development.
+Profile and settings SHALL be stored locally and encrypted with Windows DPAPI for the current user, in `%LOCALAPPDATA%\Idefix.Data` together with chats and logs. This folder SHALL be separate from the program folder `%LOCALAPPDATA%\Idefix`, so that uninstalling never deletes user data; data found in the program folder from earlier versions is moved once without overwriting anything. `IDEFIX_DATA_DIR` MAY override the storage folder for development.
+
+#### Scenario: Uninstall keeps chats
+- **WHEN** Idefix is uninstalled and installed again
+- **THEN** the profile and all chats are still there
 
 #### Scenario: API key is not stored in plain text
 - **WHEN** the profile with an API key is saved
