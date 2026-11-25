@@ -26,6 +26,9 @@ public sealed partial class AppServices : ObservableObject, IDisposable
 
     private static readonly TimeSpan UpdateInterval = TimeSpan.FromHours(4);
 
+    // Re-reads triggered by the folder watcher are usually cache hits; flashing "reading" for them only distracts.
+    private static readonly TimeSpan ReadingStatusDelay = TimeSpan.FromSeconds(1);
+
     private readonly ISettingsStore settingsStore;
     private readonly DispatcherQueue dispatcher;
     private readonly SemaphoreSlim readingGate = new(1, 1);
@@ -157,10 +160,14 @@ public sealed partial class AppServices : ObservableObject, IDisposable
             {
                 this.readPending = false;
                 this.OnUi(() => this.IsReading = true);
+                var started = this.Time.GetTimestamp();
                 var progress = new Progress<LibraryProgress>(p =>
                 {
                     observer?.Report(p);
-                    this.OnUi(() => this.LibraryStatus = Strings.Format("LibraryReadingFormat", Math.Min(p.Completed + 1, p.Total), p.Total));
+                    if (this.Time.GetElapsedTime(started) >= ReadingStatusDelay || string.IsNullOrEmpty(this.LibraryStatus))
+                    {
+                        this.OnUi(() => this.LibraryStatus = Strings.Format("LibraryReadingFormat", Math.Min(p.Completed + 1, p.Total), p.Total));
+                    }
                 });
                 var snapshot = await Task.Run(() => runtime.Library.LoadAsync(plugins: null, progress, this.lifetime.Token), this.lifetime.Token);
                 var sections = await Task.Run(() => runtime.Sections.SynchronizeAsync(snapshot.Documents, this.lifetime.Token), this.lifetime.Token);
@@ -224,7 +231,7 @@ public sealed partial class AppServices : ObservableObject, IDisposable
             CrashLog.Append("update.log", ex.ToString());
         }
 
-        var stamped = Strings.Format("UpdateCheckedFormat", DateTimeOffset.Now.ToString("t", CultureInfo.CurrentCulture), message);
+        var stamped = Strings.Format("UpdateCheckedFormat", this.Time.GetLocalNow().ToString("t", CultureInfo.CurrentCulture), message);
         this.OnUi(() => this.UpdateStatusText = stamped);
         return stamped;
     }
