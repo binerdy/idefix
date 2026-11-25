@@ -4,8 +4,6 @@
 
 Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folder of PDFs and Word documents, ask questions, and get answers with citations you can click to see the exact highlighted lines in the original.
 
-![Idefix mockup](docs/mockup/idefix-mockup.png)
-
 ## Your data stays yours
 
 - Every subfolder of your knowledge folder (default `%USERPROFILE%\IdefixKnowledge`) is a **knowledge plugin**. Add, edit or delete files and Idefix re-indexes in the background.
@@ -60,6 +58,26 @@ $env:IDEFIX_DATA_DIR = "$env:TEMP\idefix-dev"; dotnet run --project src/Idefix.A
 - **`develop`** → a nightly pre-release `v<Version>-nightly.<run>` when `develop` changed in the last 24 hours.
 - **After a release**, bump `<Version>` on `develop` to the next version; nightlies refuse to build an already released version because updaters would ignore them.
 - Set the `SIGNING_CERTIFICATE` (base64 PFX) and `SIGNING_PASSWORD` secrets to sign binaries.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- Only release artifacts built by the GitHub Actions workflows in this repository from `main` (stable) or `develop` (nightly) are signed.
+- Committers and reviewers: [binerdy](https://github.com/binerdy)
+- Approvers: [binerdy](https://github.com/binerdy)
+
+Every change reaches `main` through a pull request; each signed release is approved by an approver.
+
+## Privacy policy
+
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. In detail:
+
+- **Questions and document sections** go to the language model endpoint you configure in your profile (for example a local Ollama or your organisation's server), and only when you ask a question.
+- **The model list** is requested from that same endpoint when you click "Modelle suchen".
+- **Update checks** contact GitHub Releases at startup and every four hours to download new versions of Idefix. No personal data or document content is sent.
+
+Your documents, Markdown sections, profile and chats stay on your computer. Idefix collects no telemetry.
 
 ## Contributing
 
