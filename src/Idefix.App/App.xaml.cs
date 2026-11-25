@@ -4,6 +4,8 @@ using Idefix.App.ViewModels;
 using Idefix.App.Views;
 using Idefix.Core.Knowledge;
 using Idefix.Core.Settings;
+using Idefix.Core.Sky;
+using Microsoft.UI.Dispatching;
 
 namespace Idefix.App;
 
@@ -12,7 +14,10 @@ public sealed partial class IdefixApplication : Application
     private static readonly TimeSpan MinimumSplashTime = TimeSpan.FromSeconds(
         double.TryParse(Environment.GetEnvironmentVariable("IDEFIX_SPLASH_SECONDS"), System.Globalization.CultureInfo.InvariantCulture, out var seconds) ? seconds : 1.6);
 
+    private static readonly TimeSpan ThemeCheckInterval = TimeSpan.FromMinutes(1);
+
     private Window? window;
+    private DispatcherQueueTimer? themeTimer;
     private AppServices? services;
 
     public IdefixApplication()
@@ -36,7 +41,6 @@ public sealed partial class IdefixApplication : Application
         splash.Report(0.1, "SplashLoadingProfile");
         this.services = await AppServices.CreateAsync(this.window.DispatcherQueue);
         this.services.WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this.window);
-        this.services.SettingsChanged += (_, _) => this.ApplyTheme();
 
         await ReportKnowledgeAsync(this.services, splash);
 
@@ -46,7 +50,7 @@ public sealed partial class IdefixApplication : Application
         splash.Report(0.9, "SplashCheckingUpdates");
         try
         {
-            await this.services.CheckForUpdatesAsync().WaitAsync(TimeSpan.FromSeconds(2.5));
+            await this.services.StartUpdateChecksAsync().WaitAsync(TimeSpan.FromSeconds(2.5));
         }
         catch (TimeoutException)
         {
@@ -100,19 +104,27 @@ public sealed partial class IdefixApplication : Application
         this.window.SetTitleBar(shell.TitleBarDragRegion);
         shell.ActualThemeChanged += (sender, _) => this.ApplyCaptionColors(sender.ActualTheme);
         this.ApplyTheme();
+        if (this.themeTimer is null)
+        {
+            this.themeTimer = this.window.DispatcherQueue.CreateTimer();
+            this.themeTimer.Interval = ThemeCheckInterval;
+            this.themeTimer.Tick += (_, _) => this.ApplyTheme();
+            this.themeTimer.Start();
+        }
     }
 
     private void ApplyTheme()
     {
-        if (this.window?.Content is FrameworkElement root && this.services is { } app)
+        if (this.window?.Content is not FrameworkElement root)
         {
-            root.RequestedTheme = app.Settings.Theme switch
-            {
-                AppTheme.Light => ElementTheme.Light,
-                AppTheme.Dark => ElementTheme.Dark,
-                _ => ElementTheme.Default,
-            };
-            this.ApplyCaptionColors(root.ActualTheme);
+            return;
+        }
+
+        var theme = SkyClock.Local.IsDay(TimeProvider.System.GetUtcNow()) ? ElementTheme.Light : ElementTheme.Dark;
+        if (root.RequestedTheme != theme)
+        {
+            root.RequestedTheme = theme;
+            this.ApplyCaptionColors(theme);
         }
     }
 

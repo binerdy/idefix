@@ -15,11 +15,19 @@ namespace Idefix.App.Services;
 
 public sealed partial class AppServices : ObservableObject, IDisposable
 {
-    public static readonly Uri Repository = new("https://github.com/binerdy/idefix");
+    public static readonly Uri Repository = new("https://github.com/binerdy/idefix", UriKind.Absolute);
+
+    // Velopack installs the program into %LOCALAPPDATA%\Idefix and deletes that folder on uninstall, so user data lives next to it.
+    public static readonly string LegacyDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Idefix");
 
     public static readonly string DataDirectory = Environment.GetEnvironmentVariable("IDEFIX_DATA_DIR") is { Length: > 0 } overridden
         ? overridden
-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Idefix");
+        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Idefix.Data");
+
+    private static readonly TimeSpan UpdateInterval = TimeSpan.FromHours(4);
+
+    // Re-reads triggered by the folder watcher are usually cache hits; flashing "reading" for them only distracts.
+    private static readonly TimeSpan ReadingStatusDelay = TimeSpan.FromSeconds(1);
 
     private readonly ISettingsStore settingsStore;
     private readonly DispatcherQueue dispatcher;
@@ -68,6 +76,12 @@ public sealed partial class AppServices : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool IsUpdateReady { get; set; }
 
+    [ObservableProperty]
+    public partial string UpdateMessage { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string UpdateStatusText { get; set; } = string.Empty;
+
     public bool IsConfigured => this.Runtime is not null;
 
     public static string FormatTokens(int tokens) => tokens >= 1_000
@@ -77,6 +91,11 @@ public sealed partial class AppServices : ObservableObject, IDisposable
     public static async Task<AppServices> CreateAsync(DispatcherQueue dispatcher)
     {
         var appData = DataDirectory;
+        if (Environment.GetEnvironmentVariable("IDEFIX_DATA_DIR") is not { Length: > 0 })
+        {
+            MigrateLegacyData(appData);
+        }
+
         var settingsStore = new DpapiSettingsStore(Path.Combine(appData, "profile.dat"));
         var settings = await LoadSettingsAsync(settingsStore);
         Strings.Initialize(settings.Language);
@@ -141,10 +160,14 @@ public sealed partial class AppServices : ObservableObject, IDisposable
             {
                 this.readPending = false;
                 this.OnUi(() => this.IsReading = true);
+                var started = this.Time.GetTimestamp();
                 var progress = new Progress<LibraryProgress>(p =>
                 {
                     observer?.Report(p);
-                    this.OnUi(() => this.LibraryStatus = Strings.Format("LibraryReadingFormat", Math.Min(p.Completed + 1, p.Total), p.Total));
+                    if (this.Time.GetElapsedTime(started) >= ReadingStatusDelay || string.IsNullOrEmpty(this.LibraryStatus))
+                    {
+                        this.OnUi(() => this.LibraryStatus = Strings.Format("LibraryReadingFormat", Math.Min(p.Completed + 1, p.Total), p.Total));
+                    }
                 });
                 var snapshot = await Task.Run(() => runtime.Library.LoadAsync(plugins: null, progress, this.lifetime.Token), this.lifetime.Token);
                 var sections = await Task.Run(() => runtime.Sections.SynchronizeAsync(snapshot.Documents, this.lifetime.Token), this.lifetime.Token);
@@ -172,24 +195,45 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         }
     }
 
+    public Task StartUpdateChecksAsync()
+    {
+        var first = this.CheckForUpdatesAsync();
+        _ = this.CheckPeriodicallyAsync(first);
+        return first;
+    }
+
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Update checks are best-effort and must never crash the app.")]
     public async Task<string> CheckForUpdatesAsync()
     {
+        string message;
         try
         {
-            var status = await this.Updates.PrepareAsync(this.Settings.NightlyUpdates, this.lifetime.Token);
-            this.IsUpdateReady = status == UpdateStatus.ReadyToApply;
-            return status switch
+            var check = await this.Updates.PrepareAsync(this.Settings.NightlyUpdates, this.lifetime.Token);
+            message = check.Status switch
             {
-                UpdateStatus.ReadyToApply => Strings.Get("UpdateReady"),
+                UpdateStatus.ReadyToApply => Strings.Format("UpdateReadyFormat", check.Version ?? string.Empty),
                 UpdateStatus.UpToDate => Strings.Get("UpToDate"),
                 _ => Strings.Get("UpdatesNotInstalled"),
             };
+            this.OnUi(() =>
+            {
+                this.IsUpdateReady = check.Status == UpdateStatus.ReadyToApply;
+                this.UpdateMessage = this.IsUpdateReady ? message : string.Empty;
+            });
+        }
+        catch (OperationCanceledException) when (this.lifetime.IsCancellationRequested)
+        {
+            return string.Empty;
         }
         catch (Exception ex)
         {
-            return Strings.Format("UpdateFailedFormat", ex.Message);
+            message = Strings.Format("UpdateFailedFormat", ex.Message);
+            CrashLog.Append("update.log", ex.ToString());
         }
+
+        var stamped = Strings.Format("UpdateCheckedFormat", this.Time.GetUtcNow().ToLocalTime().ToString("t", CultureInfo.CurrentCulture), message);
+        this.OnUi(() => this.UpdateStatusText = stamped);
+        return stamped;
     }
 
     public void Dispose()
@@ -199,6 +243,23 @@ public sealed partial class AppServices : ObservableObject, IDisposable
         this.Runtime?.Dispose();
         this.HttpClient.Dispose();
         this.readingGate.Dispose();
+    }
+
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "A failed move leaves the data where it was; the app still starts.")]
+    private static void MigrateLegacyData(string dataDirectory)
+    {
+        try
+        {
+            var moved = DataDirectoryMigration.Migrate(LegacyDataDirectory, dataDirectory);
+            if (moved.Count > 0)
+            {
+                CrashLog.Append("migration.log", $"Moved {string.Join(", ", moved)} from {LegacyDataDirectory} to {dataDirectory}.");
+            }
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Append("migration.log", ex.ToString());
+        }
     }
 
     private static async Task<IdefixSettings> LoadSettingsAsync(DpapiSettingsStore store)
@@ -268,6 +329,30 @@ public sealed partial class AppServices : ObservableObject, IDisposable
     }
 
     private void OnKnowledgeChanged(object? sender, EventArgs e) => this.RequestLibraryRead();
+
+    private async Task CheckPeriodicallyAsync(Task first)
+    {
+        await first;
+        while (!this.lifetime.IsCancellationRequested)
+        {
+            await Task.Delay(UpdateInterval, this.lifetime.Token).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+            if (!this.lifetime.IsCancellationRequested)
+            {
+                await this.OnUiAsync(this.CheckForUpdatesAsync);
+            }
+        }
+    }
+
+    private Task OnUiAsync(Func<Task> action)
+    {
+        var done = new TaskCompletionSource();
+        this.dispatcher.TryEnqueue(async () =>
+        {
+            await action();
+            done.SetResult();
+        });
+        return done.Task;
+    }
 
     private void OnUi(Action action)
     {

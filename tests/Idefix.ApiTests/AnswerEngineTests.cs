@@ -87,7 +87,7 @@ public sealed class AnswerEngineTests : IDisposable
         var history = new[]
         {
             Idefix.Core.Chat.ChatMessage.FromUser("Erste Frage", TimeProvider.System),
-            new Idefix.Core.Chat.ChatMessage(Idefix.Core.Chat.ChatRole.Assistant, "Erste Antwort", DateTimeOffset.UtcNow, null, []),
+            new Idefix.Core.Chat.ChatMessage(Idefix.Core.Chat.ChatRole.Assistant, "Erste Antwort", TimeProvider.System.GetUtcNow(), null, []),
         };
 
         await Collect(this.CreateEngine(chat).AskAsync(new AnswerRequest("Zweite Frage", history, ["Recht"]), this.cancellation));
@@ -205,7 +205,7 @@ public sealed class AnswerEngineTests : IDisposable
     {
         using var server = new NoToolsServer("Drei Monate.");
         using var http = new HttpClient(server);
-        var kernel = LlmClients.CreateKernel(new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost/v1/"), string.Empty, "small"), http);
+        var kernel = LlmClients.CreateKernel(new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost/v1/", UriKind.Absolute), string.Empty, "small"), http);
 
         var events = await Collect(this.CreateEngine(kernel, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
 

@@ -34,7 +34,7 @@ public sealed partial class PixelMatrix : Grid
     private readonly bool animate = new UISettings().AnimationsEnabled
         || Environment.GetEnvironmentVariable("IDEFIX_FORCE_ANIMATIONS") == "1";
 
-    private readonly DateTimeOffset startedAt = DateTimeOffset.Now;
+    private readonly DateTimeOffset startedAt = TimeProvider.System.GetUtcNow();
     private DispatcherQueueTimer? timer;
 
     public PixelMatrix()
@@ -78,7 +78,7 @@ public sealed partial class PixelMatrix : Grid
     {
         var surface = e.Surface.Canvas;
         surface.Clear(SKColors.Transparent);
-        var elapsed = this.animate ? (DateTimeOffset.Now - this.startedAt).TotalSeconds : 10;
+        var elapsed = this.animate ? (TimeProvider.System.GetUtcNow() - this.startedAt).TotalSeconds : 10;
         var cell = Math.Min(e.Info.Width / (float)Columns, e.Info.Height / (float)Rows);
         var originX = (e.Info.Width - (cell * Columns)) / 2;
         var originY = (e.Info.Height - (cell * Rows)) / 2;

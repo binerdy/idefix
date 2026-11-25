@@ -141,18 +141,6 @@
   <data name="Appearance" xml:space="preserve">
     <value>Darstellung</value>
   </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Design</value>
-  </data>
-  <data name="ThemeSystem" xml:space="preserve">
-    <value>Systemstandard</value>
-  </data>
-  <data name="ThemeLight" xml:space="preserve">
-    <value>Hell</value>
-  </data>
-  <data name="ThemeDark" xml:space="preserve">
-    <value>Dunkel</value>
-  </data>
   <data name="Language" xml:space="preserve">
     <value>Sprache</value>
   </data>
@@ -179,9 +167,6 @@
   </data>
   <data name="CheckUpdates" xml:space="preserve">
     <value>Nach Updates suchen</value>
-  </data>
-  <data name="UpdateReady" xml:space="preserve">
-    <value>Ein Update ist bereit.</value>
   </data>
   <data name="RestartNow" xml:space="preserve">
     <value>Jetzt neu starten</value>
@@ -332,5 +317,11 @@
   </data>
   <data name="RebuildMarkdownPluginHintFormat" xml:space="preserve">
     <value>Löscht die Markdown-Abschnitte von «{0}» und erstellt sie neu. Manuelle Änderungen im _markdown-Ordner gehen verloren.</value>
+  </data>
+  <data name="UpdateReadyFormat" xml:space="preserve">
+    <value>Idefix {0} ist bereit und wird beim Schliessen installiert.</value>
+  </data>
+  <data name="UpdateCheckedFormat" xml:space="preserve">
+    <value>Geprüft um {0}: {1}</value>
   </data>
 </root>

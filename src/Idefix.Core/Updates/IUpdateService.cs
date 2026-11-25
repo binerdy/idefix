@@ -2,7 +2,7 @@
 
 public interface IUpdateService
 {
-    Task<UpdateStatus> PrepareAsync(bool includeNightly, CancellationToken cancellationToken);
+    Task<UpdateCheck> PrepareAsync(bool includeNightly, CancellationToken cancellationToken);
 
     void ApplyAndRestart();
 }

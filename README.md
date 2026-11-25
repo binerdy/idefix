@@ -4,13 +4,11 @@
 
 Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folder of PDFs and Word documents, ask questions, and get answers with citations you can click to see the exact highlighted lines in the original.
 
-![Idefix mockup](docs/mockup/idefix-mockup.png)
-
 ## Your data stays yours
 
 - Every subfolder of your knowledge folder (default `%USERPROFILE%\IdefixKnowledge`) is a **knowledge plugin**. Add, edit or delete files and Idefix re-indexes in the background.
 - Your files are opened read-only and never modified. Idefix splits them into Markdown sections in a visible `_markdown` folder inside each plugin, which you can read and edit.
-- Profile and API keys are encrypted with Windows DPAPI; chats are plain JSON in `%LOCALAPPDATA%\Idefix`.
+- Profile and API keys are encrypted with Windows DPAPI; chats are plain JSON in `%LOCALAPPDATA%\Idefix.Data`, separate from the program folder, so uninstalling never deletes them.
 - Works with any OpenAI-compatible chat model, including a local [Ollama](https://ollama.com) or the FHNW Planet Express service. No embedding model is needed.
 
 ## Features
@@ -21,7 +19,7 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 - **Citations** like `[Mietrecht.pdf, p. 4]` open an in-app viewer with the cited lines highlighted, plus "Open original file".
 - **Projects and sessions** in the sidebar; plugins can be scoped per project and toggled per chat with `+`.
 - **Context window**: set the model's context size in the profile (e.g. 524288 for GLM-5.3-Flash). If the active documents don't fit, Idefix says so instead of sending them; switch plugins off for that chat with `+`.
-- **English and Swiss German**, light and dark themes, Inter typography.
+- **English and Swiss German**, Inter typography; light by day and dark after sunset, following local sunrise and sunset through summer and winter time.
 - A quiet celestial background: a sun halo by day; dim stars, a moon and the occasional shooting star at night.
 - Automatic updates via Velopack, with an opt-in for nightly builds.
 
@@ -60,6 +58,26 @@ $env:IDEFIX_DATA_DIR = "$env:TEMP\idefix-dev"; dotnet run --project src/Idefix.A
 - **`develop`** → a nightly pre-release `v<Version>-nightly.<run>` when `develop` changed in the last 24 hours.
 - **After a release**, bump `<Version>` on `develop` to the next version; nightlies refuse to build an already released version because updaters would ignore them.
 - Set the `SIGNING_CERTIFICATE` (base64 PFX) and `SIGNING_PASSWORD` secrets to sign binaries.
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- Only release artifacts built by the GitHub Actions workflows in this repository from `main` (stable) or `develop` (nightly) are signed.
+- Committers and reviewers: [binerdy](https://github.com/binerdy)
+- Approvers: [binerdy](https://github.com/binerdy)
+
+Every change reaches `main` through a pull request; each signed release is approved by an approver.
+
+## Privacy policy
+
+This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. In detail:
+
+- **Questions and document sections** go to the language model endpoint you configure in your profile (for example a local Ollama or your organisation's server), and only when you ask a question.
+- **The model list** is requested from that same endpoint when you click "Modelle suchen".
+- **Update checks** contact GitHub Releases at startup and every four hours to download new versions of Idefix. No personal data or document content is sent.
+
+Your documents, Markdown sections, profile and chats stay on your computer. Idefix collects no telemetry.
 
 ## Contributing
 

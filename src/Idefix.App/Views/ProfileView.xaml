@@ -66,8 +66,6 @@
 
       <StackPanel x:Name="SettingsPanel" Spacing="18" Visibility="Collapsed">
         <TextBlock Text="{x:Bind services:Strings.Get('Appearance')}" FontSize="18" FontWeight="SemiBold" />
-        <ComboBox Header="{x:Bind services:Strings.Get('Theme')}" ItemsSource="{x:Bind ViewModel.Themes}"
-                  SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}" MinWidth="260" />
         <ComboBox Header="{x:Bind services:Strings.Get('Language')}" ItemsSource="{x:Bind ViewModel.Languages}"
                   SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}" MinWidth="260" />
 

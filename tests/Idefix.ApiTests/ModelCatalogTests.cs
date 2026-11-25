@@ -17,7 +17,7 @@ public sealed class ModelCatalogTests
         var models = await catalog.ListModelsAsync(LlmSettings.Default with { ApiKey = "local" }, TestContext.Current.CancellationToken);
 
         Assert.Equal(["llama3.3", "qwen3:8b"], models);
-        Assert.Equal(new Uri("http://localhost:11434/v1/models"), handler.Request!.RequestUri);
+        Assert.Equal(new Uri("http://localhost:11434/v1/models", UriKind.Absolute), handler.Request!.RequestUri);
         Assert.Equal("Bearer local", handler.Request.Headers.Authorization!.ToString());
     }
 

@@ -17,7 +17,7 @@ public sealed partial class CelestialLayer : Grid
     private readonly IReadOnlyList<Star> stars = StarField.Generate(seed: 1707, StarCount);
     private readonly Random random = new();
     private readonly UISettings uiSettings = new();
-    private readonly DateTimeOffset startedAt = DateTimeOffset.Now;
+    private readonly DateTimeOffset startedAt = TimeProvider.System.GetUtcNow();
     private DispatcherQueueTimer? timer;
     private SkyPoint? lastPointer;
     private ShootingStar? shootingStar;
@@ -111,7 +111,7 @@ public sealed partial class CelestialLayer : Grid
             return;
         }
 
-        this.ScheduleShootingStar(DateTimeOffset.Now);
+        this.ScheduleShootingStar(TimeProvider.System.GetUtcNow());
         this.timer.Interval = this.IsNightSky && this.uiSettings.AnimationsEnabled ? FrameInterval : IdleInterval;
         this.timer.Start();
         this.canvas.Invalidate();
@@ -133,20 +133,19 @@ public sealed partial class CelestialLayer : Grid
         surface.Scale(scale);
         var width = this.ActualWidth;
         var height = this.ActualHeight;
-        var now = DateTimeOffset.Now;
-        var time = TimeOnly.FromDateTime(now.LocalDateTime);
+        var now = TimeProvider.System.GetUtcNow();
 
         if (this.IsNightSky)
         {
             this.DrawStars(surface, width, height, (now - this.startedAt).TotalSeconds);
-            if (SkyClock.MoonProgress(time) is { } moon)
+            if (SkyClock.Local.MoonProgress(now) is { } moon)
             {
                 DrawMoon(surface, SkyClock.ArcPoint(moon, width, height));
             }
 
             this.DrawShootingStar(surface, width, height, now);
         }
-        else if (SkyClock.SunProgress(time) is { } sun)
+        else if (SkyClock.Local.SunProgress(now) is { } sun)
         {
             DrawSun(surface, SkyClock.ArcPoint(sun, width, height));
         }

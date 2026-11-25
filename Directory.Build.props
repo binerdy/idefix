@@ -3,7 +3,7 @@
 <Project>
   <PropertyGroup>
     <!-- Single source of truth: main releases v$(Version), develop nightlies publish $(Version)-nightly.N. -->
-    <Version Condition="'$(Version)' == ''">0.3.0</Version>
+    <Version Condition="'$(Version)' == ''">0.4.0</Version>
     <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />
     <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)external.globalconfig" />
     <Compile Include="$(MSBuildThisFileDirectory)src/AssemblyInfo.cs" Link="Properties/AssemblyInfo.Shared.cs" />
     <AssemblyAttribute Include="AssemblyMetadata">

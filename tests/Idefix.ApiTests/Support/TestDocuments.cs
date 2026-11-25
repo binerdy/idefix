@@ -62,7 +62,7 @@ internal static class TestDocuments
         return path;
     }
 
-    public static void Touch(string path, DateTime lastWriteUtc) => File.SetLastWriteTimeUtc(path, lastWriteUtc);
+    public static void Touch(string path, DateTimeOffset lastWrite) => File.SetLastWriteTimeUtc(path, lastWrite.UtcDateTime);
 
     private static string[] Lines(string page) => page.Split('\n');
 

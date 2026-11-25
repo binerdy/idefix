@@ -87,6 +87,10 @@ indent_size = 2
 [*.g.cs]
 generated_code = true
 
+# The XAML compiler emits new Uri(string) for ms-appx resources; generated files cannot be changed.
+[*.g.i.cs]
+dotnet_diagnostic.RS0030.severity = none
+
 [src/Idefix.App/**.cs]
 # CommunityToolkit.Mvvm generates camelCase backing fields next to PascalCase commands.
 dotnet_diagnostic.CA1708.severity = none

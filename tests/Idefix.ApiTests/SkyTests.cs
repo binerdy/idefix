@@ -1,34 +1,76 @@
-﻿using Idefix.Core.Sky;
+﻿using System.Globalization;
+using Idefix.Core.Sky;
 
 namespace Idefix.ApiTests;
 
 public sealed class SkyTests
 {
+    private static readonly TimeZoneInfo Zurich = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+    private static readonly SkyClock ZurichClock = new(SkyLocation.Zurich, Zurich);
+
     [Theory]
-    [InlineData("06:00", SkyPhase.Day)]
-    [InlineData("17:59", SkyPhase.Day)]
-    [InlineData("18:00", SkyPhase.Evening)]
-    [InlineData("21:59", SkyPhase.Evening)]
-    [InlineData("22:00", SkyPhase.Night)]
-    [InlineData("05:59", SkyPhase.Night)]
-    public void PhaseFollowsTheTimeArc(string time, SkyPhase expected)
+    [InlineData(2026, 6, 21, "05:30", "21:26")]
+    [InlineData(2026, 12, 21, "08:12", "16:37")]
+    public void SunriseAndSunsetMatchTheAlmanac(int year, int month, int day, string sunrise, string sunset)
     {
-        Assert.Equal(expected, SkyClock.Phase(TimeOnly.Parse(time, System.Globalization.CultureInfo.InvariantCulture)));
+        var sun = ZurichClock.SunOn(new DateOnly(year, month, day));
+
+        AssertNear(TimeOnly.Parse(sunrise, CultureInfo.InvariantCulture), sun.Sunrise);
+        AssertNear(TimeOnly.Parse(sunset, CultureInfo.InvariantCulture), sun.Sunset);
     }
 
     [Fact]
-    public void SunPeaksAtNoonAndIsAbsentAtNight()
+    public void SummerTimeShiftsTheLocalSunriseByAnHour()
     {
-        Assert.Equal(0.5, SkyClock.SunProgress(new TimeOnly(12, 0)));
-        Assert.Null(SkyClock.SunProgress(new TimeOnly(23, 0)));
+        var before = ZurichClock.SunOn(new DateOnly(2026, 3, 28)).Sunrise;
+        var after = ZurichClock.SunOn(new DateOnly(2026, 3, 29)).Sunrise;
+
+        Assert.InRange(after.TimeOfDay - before.TimeOfDay, TimeSpan.FromMinutes(55), TimeSpan.FromMinutes(59));
+        Assert.Equal(TimeSpan.FromHours(2), after.Offset);
+    }
+
+    [Theory]
+    [InlineData(2026, 12, 21, 17, false)]
+    [InlineData(2026, 6, 21, 17, true)]
+    [InlineData(2026, 6, 21, 22, false)]
+    [InlineData(2026, 12, 21, 12, true)]
+    public void DaylightDecidesTheTheme(int year, int month, int day, int hour, bool isDay)
+    {
+        Assert.Equal(isDay, ZurichClock.IsDay(Local(year, month, day, hour)));
     }
 
     [Fact]
-    public void MoonIsVisibleOnlyFromEveningToMorning()
+    public void SunPeaksAroundNoonAndIsAbsentAtNight()
     {
-        Assert.Equal(0, SkyClock.MoonProgress(new TimeOnly(18, 0)));
-        Assert.Equal(0.5, SkyClock.MoonProgress(new TimeOnly(0, 0)));
-        Assert.Null(SkyClock.MoonProgress(new TimeOnly(9, 0)));
+        Assert.InRange(ZurichClock.SunProgress(Local(2026, 12, 21, 12, 28))!.Value, 0.45, 0.55);
+        Assert.Null(ZurichClock.SunProgress(Local(2026, 12, 21, 23)));
+    }
+
+    [Fact]
+    public void MoonCrossesTheWholeNight()
+    {
+        Assert.Null(ZurichClock.MoonProgress(Local(2026, 12, 21, 12)));
+        Assert.InRange(ZurichClock.MoonProgress(Local(2026, 12, 21, 16, 50))!.Value, 0, 0.05);
+        Assert.InRange(ZurichClock.MoonProgress(Local(2026, 12, 22, 0, 28))!.Value, 0.45, 0.55);
+        Assert.InRange(ZurichClock.MoonProgress(Local(2026, 12, 22, 8))!.Value, 0.95, 1);
+    }
+
+    [Fact]
+    public void PolarSummerAndWinterNeverFlipTheTheme()
+    {
+        var tromso = new SkyClock(new SkyLocation(69.65, 18.96), Zurich);
+
+        Assert.True(tromso.IsDay(Local(2026, 6, 21, 1)));
+        Assert.False(tromso.IsDay(Local(2026, 12, 21, 12)));
+    }
+
+    [Fact]
+    public void UnknownTimeZonesUseTheirOffsetAsLongitude()
+    {
+        var tokyo = TimeZoneInfo.CreateCustomTimeZone("Test/Tokyo", TimeSpan.FromHours(9), "Tokyo", "Tokyo");
+
+        Assert.Equal(SkyLocation.Zurich, SkyLocation.ForTimeZone(Zurich));
+        Assert.Equal(135, SkyLocation.ForTimeZone(tokyo).Longitude);
     }
 
     [Fact]
@@ -72,6 +114,18 @@ public sealed class SkyTests
 
         Assert.Equal(first, second);
         Assert.All(first, s => Assert.InRange(s.Brightness(3.3), 0.05, 0.4));
+    }
+
+    private static DateTimeOffset Local(int year, int month, int day, int hour, int minute = 0)
+    {
+        var standard = new DateTimeOffset(year, month, day, hour, minute, 0, Zurich.BaseUtcOffset);
+        return new DateTimeOffset(year, month, day, hour, minute, 0, Zurich.GetUtcOffset(standard));
+    }
+
+    private static void AssertNear(TimeOnly expected, DateTimeOffset actual)
+    {
+        var difference = (actual.TimeOfDay - expected.ToTimeSpan()).Duration();
+        Assert.True(difference <= TimeSpan.FromMinutes(3), $"Expected about {expected}, got {actual:HH:mm}.");
     }
 
     private static double Distance(SkyPoint a, SkyPoint b) => Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));

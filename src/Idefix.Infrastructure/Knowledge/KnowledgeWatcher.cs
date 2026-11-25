@@ -7,10 +7,12 @@ public sealed class KnowledgeWatcher : IDisposable
     private readonly FileSystemWatcher watcher;
     private readonly ITimer debounce;
     private readonly TimeSpan quietPeriod;
+    private readonly string rootDirectory;
 
     public KnowledgeWatcher(string rootDirectory, TimeSpan quietPeriod, TimeProvider timeProvider)
     {
         this.quietPeriod = quietPeriod;
+        this.rootDirectory = rootDirectory;
         this.debounce = timeProvider.CreateTimer(_ => this.Changed?.Invoke(this, EventArgs.Empty), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         this.watcher = new FileSystemWatcher(rootDirectory)
         {
@@ -34,7 +36,9 @@ public sealed class KnowledgeWatcher : IDisposable
 
     private void OnFileSystemEvent(object sender, FileSystemEventArgs e)
     {
-        if (!KnowledgeLayout.IsSupportedDocument(e.FullPath) && Path.HasExtension(e.FullPath))
+        // Idefix writes the _markdown folders itself; reacting to them would re-read the library in a loop.
+        if (KnowledgeLayout.IsInMarkdownFolder(Path.GetRelativePath(this.rootDirectory, e.FullPath))
+            || (!KnowledgeLayout.IsSupportedDocument(e.FullPath) && Path.HasExtension(e.FullPath)))
         {
             return;
         }

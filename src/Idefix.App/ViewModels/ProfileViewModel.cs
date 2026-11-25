@@ -28,8 +28,6 @@ public sealed partial class ProfileViewModel : ObservableObject
 
     public ReadOnlyCollection<string> Providers { get; } = new([Strings.Get("ProviderOllama"), Strings.Get("ProviderOpenAI"), Strings.Get("ProviderCompatible")]);
 
-    public ReadOnlyCollection<string> Themes { get; } = new([Strings.Get("ThemeSystem"), Strings.Get("ThemeLight"), Strings.Get("ThemeDark")]);
-
     public ReadOnlyCollection<string> Languages { get; } = new([Strings.Get("LanguageSystem"), Strings.Get("LanguageEnglish"), Strings.Get("LanguageGerman")]);
 
     public ObservableCollection<string> AvailableModels { get; } = [];
@@ -63,9 +61,6 @@ public sealed partial class ProfileViewModel : ObservableObject
     public partial string PrePrompt { get; set; }
 
     [ObservableProperty]
-    public partial int ThemeIndex { get; set; }
-
-    [ObservableProperty]
     public partial int LanguageIndex { get; set; }
 
     [ObservableProperty]
@@ -93,9 +88,9 @@ public sealed partial class ProfileViewModel : ObservableObject
         this.ChatModel = settings.Llm.ChatModel;
         this.MaxContextTokens = settings.Llm.MaxContextTokens;
         this.PrePrompt = settings.PrePrompt;
-        this.ThemeIndex = (int)settings.Theme;
         this.LanguageIndex = (int)settings.Language;
         this.NightlyUpdates = settings.NightlyUpdates;
+        this.UpdateStatus = this.services.UpdateStatusText;
         this.Status = string.Empty;
         this.OnPropertyChanged(nameof(this.NeedsSetup));
     }
@@ -138,7 +133,6 @@ public sealed partial class ProfileViewModel : ObservableObject
             RootDirectory = this.RootDirectory.Trim(),
             Llm = this.BuildLlm(),
             PrePrompt = this.PrePrompt,
-            Theme = (AppTheme)this.ThemeIndex,
             Language = (AppLanguage)this.LanguageIndex,
             NightlyUpdates = this.NightlyUpdates,
         };

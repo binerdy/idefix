@@ -40,7 +40,7 @@ public sealed class DocumentLibraryTests : IDisposable
         Assert.Equal(2, this.library.Parses);
 
         TestDocuments.WriteDocx(edited, "neu");
-        TestDocuments.Touch(edited, DateTime.UtcNow.AddMinutes(1));
+        TestDocuments.Touch(edited, TimeProvider.System.GetUtcNow().AddMinutes(1));
         var snapshot = await this.library.LoadAsync(plugins: null, progress: null, this.cancellation);
 
         Assert.Equal(3, this.library.Parses);
