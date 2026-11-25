@@ -17,7 +17,7 @@ public sealed partial class CelestialLayer : Grid
     private readonly IReadOnlyList<Star> stars = StarField.Generate(seed: 1707, StarCount);
     private readonly Random random = new();
     private readonly UISettings uiSettings = new();
-    private readonly DateTimeOffset startedAt = TimeProvider.System.GetLocalNow();
+    private readonly DateTimeOffset startedAt = TimeProvider.System.GetUtcNow();
     private DispatcherQueueTimer? timer;
     private SkyPoint? lastPointer;
     private ShootingStar? shootingStar;
@@ -111,7 +111,7 @@ public sealed partial class CelestialLayer : Grid
             return;
         }
 
-        this.ScheduleShootingStar(TimeProvider.System.GetLocalNow());
+        this.ScheduleShootingStar(TimeProvider.System.GetUtcNow());
         this.timer.Interval = this.IsNightSky && this.uiSettings.AnimationsEnabled ? FrameInterval : IdleInterval;
         this.timer.Start();
         this.canvas.Invalidate();
@@ -133,7 +133,7 @@ public sealed partial class CelestialLayer : Grid
         surface.Scale(scale);
         var width = this.ActualWidth;
         var height = this.ActualHeight;
-        var now = TimeProvider.System.GetLocalNow();
+        var now = TimeProvider.System.GetUtcNow();
 
         if (this.IsNightSky)
         {

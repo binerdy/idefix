@@ -118,8 +118,8 @@ public sealed class SkyTests
 
     private static DateTimeOffset Local(int year, int month, int day, int hour, int minute = 0)
     {
-        var wall = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Unspecified);
-        return new DateTimeOffset(wall, Zurich.GetUtcOffset(wall));
+        var standard = new DateTimeOffset(year, month, day, hour, minute, 0, Zurich.BaseUtcOffset);
+        return new DateTimeOffset(year, month, day, hour, minute, 0, Zurich.GetUtcOffset(standard));
     }
 
     private static void AssertNear(TimeOnly expected, DateTimeOffset actual)

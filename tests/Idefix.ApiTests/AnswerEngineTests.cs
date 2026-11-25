@@ -205,7 +205,7 @@ public sealed class AnswerEngineTests : IDisposable
     {
         using var server = new NoToolsServer("Drei Monate.");
         using var http = new HttpClient(server);
-        var kernel = LlmClients.CreateKernel(new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost/v1/"), string.Empty, "small"), http);
+        var kernel = LlmClients.CreateKernel(new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost/v1/", UriKind.Absolute), string.Empty, "small"), http);
 
         var events = await Collect(this.CreateEngine(kernel, selectionThreshold: 1).AskAsync(new AnswerRequest("Kuendigungsfrist?", [], ["Recht", "Kochen"]), this.cancellation));
 

@@ -10,7 +10,7 @@ public static class CrashLog
     {
         var directory = Path.Combine(AppServices.DataDirectory, "logs");
         Directory.CreateDirectory(directory);
-        var entry = string.Create(CultureInfo.InvariantCulture, $"[{TimeProvider.System.GetLocalNow():O}] {message}{Environment.NewLine}");
+        var entry = string.Create(CultureInfo.InvariantCulture, $"[{TimeProvider.System.GetUtcNow():O}] {message}{Environment.NewLine}");
         File.AppendAllText(Path.Combine(directory, fileName), entry);
     }
 }

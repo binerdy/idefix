@@ -120,7 +120,7 @@ public sealed partial class IdefixApplication : Application
             return;
         }
 
-        var theme = SkyClock.Local.IsDay(TimeProvider.System.GetLocalNow()) ? ElementTheme.Light : ElementTheme.Dark;
+        var theme = SkyClock.Local.IsDay(TimeProvider.System.GetUtcNow()) ? ElementTheme.Light : ElementTheme.Dark;
         if (root.RequestedTheme != theme)
         {
             root.RequestedTheme = theme;

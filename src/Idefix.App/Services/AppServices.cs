@@ -15,7 +15,7 @@ namespace Idefix.App.Services;
 
 public sealed partial class AppServices : ObservableObject, IDisposable
 {
-    public static readonly Uri Repository = new("https://github.com/binerdy/idefix");
+    public static readonly Uri Repository = new("https://github.com/binerdy/idefix", UriKind.Absolute);
 
     // Velopack installs the program into %LOCALAPPDATA%\Idefix and deletes that folder on uninstall, so user data lives next to it.
     public static readonly string LegacyDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Idefix");
@@ -231,7 +231,7 @@ public sealed partial class AppServices : ObservableObject, IDisposable
             CrashLog.Append("update.log", ex.ToString());
         }
 
-        var stamped = Strings.Format("UpdateCheckedFormat", this.Time.GetLocalNow().ToString("t", CultureInfo.CurrentCulture), message);
+        var stamped = Strings.Format("UpdateCheckedFormat", this.Time.GetUtcNow().ToLocalTime().ToString("t", CultureInfo.CurrentCulture), message);
         this.OnUi(() => this.UpdateStatusText = stamped);
         return stamped;
     }

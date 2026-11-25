@@ -18,11 +18,11 @@ public sealed record LlmSettings(
     [SuppressMessage("Major Code Smell", "S1075:URIs should not be hardcoded", Justification = "Well-known provider defaults; overridable per profile.")]
     public static Uri DefaultEndpoint(LlmProviderKind provider) => provider switch
     {
-        LlmProviderKind.OpenAI => new Uri("https://api.openai.com/v1/"),
-        _ => new Uri("http://localhost:11434/v1/"),
+        LlmProviderKind.OpenAI => new Uri("https://api.openai.com/v1/", UriKind.Absolute),
+        _ => new Uri("http://localhost:11434/v1/", UriKind.Absolute),
     };
 
     [SuppressMessage("Major Code Smell", "S1075:URIs should not be hardcoded", Justification = "Relative URIs resolve against the last segment only with a trailing slash.")]
     public static Uri AsBaseAddress(Uri endpoint) =>
-        endpoint.AbsoluteUri[^1] == '/' ? endpoint : new Uri(endpoint.AbsoluteUri + "/");
+        endpoint.AbsoluteUri[^1] == '/' ? endpoint : new Uri(endpoint.AbsoluteUri + "/", UriKind.Absolute);
 }

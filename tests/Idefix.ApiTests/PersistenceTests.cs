@@ -22,7 +22,7 @@ public sealed class PersistenceTests : IDisposable
         var store = new DpapiSettingsStore(path);
         var settings = IdefixSettings.CreateDefault(this.root.Path, "Anna") with
         {
-            Llm = new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost:11434/v1/"), "secret-key-123", "llama3.3", MaxContextTokens: 524_288),
+            Llm = new LlmSettings(LlmProviderKind.Ollama, new Uri("http://localhost:11434/v1/", UriKind.Absolute), "secret-key-123", "llama3.3", MaxContextTokens: 524_288),
             NightlyUpdates = true,
             DisabledPlugins = ["Medizin"],
         };

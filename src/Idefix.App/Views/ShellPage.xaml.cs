@@ -131,7 +131,10 @@ public sealed partial class ShellPage : Page
         var boxes = plugins
             .Select(p => new CheckBox { Content = p.Name, IsChecked = project.PluginScope?.Contains(p.Name, StringComparer.OrdinalIgnoreCase) == true })
             .ToList();
-        boxes.ForEach(panel.Children.Add);
+        foreach (var box in boxes)
+        {
+            panel.Children.Add(box);
+        }
 
         var dialog = new ContentDialog
         {
