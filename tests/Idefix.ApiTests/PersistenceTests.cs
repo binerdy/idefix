@@ -55,7 +55,7 @@ public sealed class PersistenceTests : IDisposable
             .Append(new ChatMessage(
                 ChatRole.Assistant,
                 "Drei Monate [Mietrecht.pdf, p. 2].",
-                DateTimeOffset.UtcNow,
+                TimeProvider.System.GetUtcNow(),
                 new ContextSummary(["Recht/Mietrecht.pdf"], 1234),
                 [new Citation("Mietrecht.pdf", 2, "Recht/Mietrecht.pdf", 1, 3)]));
 

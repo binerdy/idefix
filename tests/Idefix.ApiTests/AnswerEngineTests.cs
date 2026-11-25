@@ -87,7 +87,7 @@ public sealed class AnswerEngineTests : IDisposable
         var history = new[]
         {
             Idefix.Core.Chat.ChatMessage.FromUser("Erste Frage", TimeProvider.System),
-            new Idefix.Core.Chat.ChatMessage(Idefix.Core.Chat.ChatRole.Assistant, "Erste Antwort", DateTimeOffset.UtcNow, null, []),
+            new Idefix.Core.Chat.ChatMessage(Idefix.Core.Chat.ChatRole.Assistant, "Erste Antwort", TimeProvider.System.GetUtcNow(), null, []),
         };
 
         await Collect(this.CreateEngine(chat).AskAsync(new AnswerRequest("Zweite Frage", history, ["Recht"]), this.cancellation));

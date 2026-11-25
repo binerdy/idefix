@@ -57,7 +57,7 @@ public sealed class MarkdownSectionStoreTests : IDisposable
         Assert.Equal(1, this.store.Writes);
 
         TestDocuments.WriteDocx(source, "# Kündigung\nNeu");
-        TestDocuments.Touch(source, DateTime.UtcNow.AddMinutes(1));
+        TestDocuments.Touch(source, TimeProvider.System.GetUtcNow().UtcDateTime.AddMinutes(1));
         var regenerated = await this.SyncAsync();
 
         Assert.Contains("Neu", Assert.Single(regenerated).Markdown, StringComparison.Ordinal);

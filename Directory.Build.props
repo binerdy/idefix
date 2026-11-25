@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />
     <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)external.globalconfig" />
     <Compile Include="$(MSBuildThisFileDirectory)src/AssemblyInfo.cs" Link="Properties/AssemblyInfo.Shared.cs" />
     <AssemblyAttribute Include="AssemblyMetadata">
