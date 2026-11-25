@@ -277,7 +277,7 @@
     <value>Kontextfenster (Tokens)</value>
   </data>
   <data name="ContextWindowHint" xml:space="preserve">
-    <value>Die Kontextgrösse des Modells, z. B. 524288 für GLM-5.3-Flash auf Planet Express. Idefix sendet nur die relevanten Abschnitte und nie mehr als hineinpasst.</value>
+    <value>Die Kontextgrösse des Modells laut deinem Anbieter, z. B. 131072. Idefix sendet nur die relevanten Abschnitte und nie mehr als hineinpasst.</value>
   </data>
   <data name="LibraryReadingFormat" xml:space="preserve">
     <value>Lese Dokumente {0}/{1} …</value>

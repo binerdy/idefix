@@ -9,7 +9,7 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 - Every subfolder of your knowledge folder (default `%USERPROFILE%\IdefixKnowledge`) is a **knowledge plugin**. Add, edit or delete files and Idefix re-indexes in the background.
 - Your files are opened read-only and never modified. Idefix splits them into Markdown sections in a visible `_markdown` folder inside each plugin, which you can read and edit.
 - Profile and API keys are encrypted with Windows DPAPI; chats are plain JSON in `%LOCALAPPDATA%\Idefix.Data`, separate from the program folder, so uninstalling never deletes them.
-- Works with any OpenAI-compatible chat model, including a local [Ollama](https://ollama.com) or the FHNW Planet Express service. No embedding model is needed.
+- Works with any OpenAI-compatible chat model, including a local [Ollama](https://ollama.com) or your organisation's own server. No embedding model is needed.
 
 ## Features
 
@@ -18,7 +18,7 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 - **Markdown stays in sync**: sections follow added, changed and deleted documents automatically; "Markdown neu erstellen" in the Library regenerates them on demand.
 - **Citations** like `[Mietrecht.pdf, p. 4]` open an in-app viewer with the cited lines highlighted, plus "Open original file".
 - **Projects and sessions** in the sidebar; plugins can be scoped per project and toggled per chat with `+`.
-- **Context window**: set the model's context size in the profile (e.g. 524288 for GLM-5.3-Flash). If the active documents don't fit, Idefix says so instead of sending them; switch plugins off for that chat with `+`.
+- **Context window**: set the model's context size in the profile as stated by your provider. If the active documents don't fit, Idefix says so instead of sending them; switch plugins off for that chat with `+`.
 - **English and Swiss German**, Inter typography; light by day and dark after sunset, following local sunrise and sunset through summer and winter time.
 - A quiet celestial background: a sun halo by day; dim stars, a moon and the occasional shooting star at night.
 - Automatic updates via Velopack, with an opt-in for nightly builds.
