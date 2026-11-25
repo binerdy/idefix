@@ -141,18 +141,6 @@
   <data name="Appearance" xml:space="preserve">
     <value>Darstellung</value>
   </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Design</value>
-  </data>
-  <data name="ThemeSystem" xml:space="preserve">
-    <value>Systemstandard</value>
-  </data>
-  <data name="ThemeLight" xml:space="preserve">
-    <value>Hell</value>
-  </data>
-  <data name="ThemeDark" xml:space="preserve">
-    <value>Dunkel</value>
-  </data>
   <data name="Language" xml:space="preserve">
     <value>Sprache</value>
   </data>

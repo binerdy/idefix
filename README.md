@@ -19,7 +19,7 @@ Idefix is a local-first, privacy-focused desktop RAG client. Point it at a folde
 - **Citations** like `[Mietrecht.pdf, p. 4]` open an in-app viewer with the cited lines highlighted, plus "Open original file".
 - **Projects and sessions** in the sidebar; plugins can be scoped per project and toggled per chat with `+`.
 - **Context window**: set the model's context size in the profile (e.g. 524288 for GLM-5.3-Flash). If the active documents don't fit, Idefix says so instead of sending them; switch plugins off for that chat with `+`.
-- **English and Swiss German**, light and dark themes, Inter typography.
+- **English and Swiss German**, Inter typography; light by day and dark after sunset, following local sunrise and sunset through summer and winter time.
 - A quiet celestial background: a sun halo by day; dim stars, a moon and the occasional shooting star at night.
 - Automatic updates via Velopack, with an opt-in for nightly builds.
 

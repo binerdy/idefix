@@ -5,7 +5,6 @@ public sealed record IdefixSettings(
     string RootDirectory,
     LlmSettings Llm,
     string PrePrompt,
-    AppTheme Theme,
     AppLanguage Language,
     bool NightlyUpdates,
     IReadOnlyList<string> DisabledPlugins)
@@ -15,7 +14,6 @@ public sealed record IdefixSettings(
         Path.Combine(userProfileDirectory, "IdefixKnowledge"),
         LlmSettings.Default,
         string.Empty,
-        AppTheme.System,
         AppLanguage.System,
         NightlyUpdates: false,
         DisabledPlugins: []);

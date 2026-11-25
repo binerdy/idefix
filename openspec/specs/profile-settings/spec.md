@@ -38,7 +38,7 @@ Every provider, Ollama included, SHALL require a non-empty API key before chats 
 - **THEN** the app shows the setup hint and does not start indexing
 
 ### Requirement: Settings tab
-The Settings tab SHALL contain theme (System, Light, Dark), language (System, English, Deutsch (Schweiz)) and the nightly-build opt-in. Theme and language apply immediately.
+The Settings tab SHALL contain language (System, English, Deutsch (Schweiz)) and the nightly-build opt-in. Language applies immediately. The theme follows daylight and has no setting (see celestial-background).
 
 #### Scenario: Language switch
 - **WHEN** the user selects "Deutsch (Schweiz)" and saves
