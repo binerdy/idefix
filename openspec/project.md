@@ -83,5 +83,5 @@ Projects:
 - The app must remain usable offline with a local Ollama instance.
 
 ## External Dependencies
-- An OpenAI-compatible chat endpoint (OpenAI, Ollama, FHNW Planet Express or a local router).
+- An OpenAI-compatible chat endpoint (OpenAI, Ollama, an organisation's own server or a local router).
 - GitHub Releases as the Velopack update feed.

@@ -1,4 +1,4 @@
-# Mirrors the BannedSymbols.txt of the FHNW Swe.Baseline; keep it in sync by hand.
+# Shared banned-API list; keep it in sync with the upstream baseline by hand.
 
 # Syntax: PREFIX:Fully.Qualified.Symbol;Message
 # Prefixes: T = type, M = method, P = property, F = field

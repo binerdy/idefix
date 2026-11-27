@@ -277,7 +277,7 @@
     <value>Context window (tokens)</value>
   </data>
   <data name="ContextWindowHint" xml:space="preserve">
-    <value>The model's context size, e.g. 524288 for GLM-5.3-Flash on Planet Express. Idefix sends only the relevant sections and never more than fits.</value>
+    <value>The model's context size as stated by your provider, e.g. 131072. Idefix sends only the relevant sections and never more than fits.</value>
   </data>
   <data name="LibraryReadingFormat" xml:space="preserve">
     <value>Reading documents {0}/{1}…</value>

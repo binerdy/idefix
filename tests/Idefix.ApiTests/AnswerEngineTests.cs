@@ -140,6 +140,19 @@ public sealed class AnswerEngineTests : IDisposable
     }
 
     [Fact]
+    public async Task WhenNothingMatchesTheModelIsToldSoAndMustNotGuess()
+    {
+        var chat = new ScriptedChatCompletion("Dazu habe ich in deinen Dokumenten nichts gefunden.", "{\"sections\": []}");
+
+        var events = await Collect(this.CreateEngine(chat, selectionThreshold: 1).AskAsync(new AnswerRequest("Wie hoch ist der Mond?", [], ["Recht", "Kochen"], DeepThinking: false), this.cancellation));
+
+        Assert.Empty(Assert.Single(events.OfType<ContextPrepared>()).Summary.Documents);
+        Assert.EndsWith("Documents: none. " + PromptComposer.NothingFound, chat.LastHistory![^1].Content, StringComparison.Ordinal);
+        Assert.Contains("could not find anything", chat.LastHistory[0].Content, StringComparison.Ordinal);
+        Assert.Contains("Never answer from general knowledge", chat.LastHistory[0].Content, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task PingPongLetsTheModelSearchAgainAndShowsItLive()
     {
         var chat = new ScriptedChatCompletion("Butter.") { TextBeforeToolCalls = "Moment." };

@@ -5,6 +5,8 @@ namespace Idefix.Core.Agent;
 
 public static class PromptComposer
 {
+    public const string NothingFound = "No section of the user's documents matched this question.";
+
     public static string SystemPrompt(string prePrompt, IReadOnlyCollection<string> plugins, bool mayRequestMore = false)
     {
         var builder = new StringBuilder();
@@ -22,7 +24,7 @@ public static class PromptComposer
             builder.AppendLine("The sections come from a keyword search. If they answer the question, answer right away. If something is missing, search again with other words or look at the table of contents before you answer.");
         }
 
-        builder.AppendLine("If the documents do not contain the answer, say so plainly instead of guessing.");
+        builder.AppendLine("If the documents do not answer the question, tell the user in one short sentence, addressing them directly, that you could not find anything about it in their documents. Never answer from general knowledge and never guess.");
         builder.AppendLine("Answer in the language of the user's question.");
         return builder.ToString();
     }
@@ -43,6 +45,11 @@ public static class PromptComposer
             synonymous wording when they are relevant. Reply {"sections": []} when no section is relevant.
             """);
 
-    public static string Question(string question, DocumentContext context) =>
-        string.Create(CultureInfo.InvariantCulture, $"{question}\n\nDocuments:\n{context.Text}");
+    public static string Question(string question, DocumentContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return context.Summary.Documents.Count == 0
+            ? string.Create(CultureInfo.InvariantCulture, $"{question}\n\nDocuments: none. {NothingFound}")
+            : string.Create(CultureInfo.InvariantCulture, $"{question}\n\nDocuments:\n{context.Text}");
+    }
 }
